@@ -27,12 +27,14 @@ interface ExplorerClientProps {
   initialCatalog: FilterCatalogDto;
   initialPapers: PaperDto[];
   initialTotal: number;
+  initialError?: string;
 }
 
 export function ExplorerClient({
   initialCatalog,
   initialPapers,
   initialTotal,
+  initialError = "",
 }: ExplorerClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [year, setYear] = useState<number | undefined>(undefined);
@@ -51,7 +53,7 @@ export function ExplorerClient({
   const [papers, setPapers] = useState<PaperDto[]>(initialPapers);
   const [total, setTotal] = useState<number>(initialTotal);
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState(initialError);
 
   const [treeData, setTreeData] = useState<FolderTreeYearDto[] | null>(null);
   const [treeLoading, setTreeLoading] = useState(false);

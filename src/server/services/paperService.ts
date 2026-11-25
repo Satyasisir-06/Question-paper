@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import type { Readable } from "node:stream";
 import type { AppDb } from "@/server/db/client";
-import type { StorageProvider } from "@/server/storage";
+import { getStorageProvider, type StorageProvider } from "@/server/storage";
 import {
   PaperRepository,
   type PaperFilterParams,
@@ -40,7 +40,7 @@ export class PaperService {
 
   constructor(
     db: AppDb,
-    private readonly storage: StorageProvider
+    private readonly storage?: StorageProvider
   ) {
     this.paperRepo = new PaperRepository(db);
     this.catalogRepo = new CatalogRepository(db);
@@ -98,7 +98,8 @@ export class PaperService {
     const record = await this.paperRepo.findApprovedById(id);
     if (!record) return null;
 
-    const stream = await this.storage.getObjectStream(record.storageKey);
+    const storage = this.storage ?? getStorageProvider();
+    const stream = await storage.getObjectStream(record.storageKey);
     if (mode === "view") {
       await this.paperRepo.incrementViewCount(id);
     } else {

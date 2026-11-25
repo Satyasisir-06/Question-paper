@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { getDb } from "@/server/db/client";
-import { getStorageProvider } from "@/server/storage";
 import { UploadService } from "@/server/services/uploadService";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import {
@@ -30,17 +29,22 @@ async function TrackBody({
   let initialError = "";
 
   if (initialCode) {
-    const db = await getDb();
-    const service = new UploadService(db, getStorageProvider());
-    const found = await service.trackByCode(initialCode);
-    if (!found) {
-      initialError = "No submission matches that tracking code.";
-    } else {
-      initialResult = {
-        ...found,
-        createdAt: found.createdAt.toISOString(),
-        reviewedAt: found.reviewedAt ? found.reviewedAt.toISOString() : null,
-      };
+    try {
+      const db = await getDb();
+      const service = new UploadService(db);
+      const found = await service.trackByCode(initialCode);
+      if (!found) {
+        initialError = "No submission matches that tracking code.";
+      } else {
+        initialResult = {
+          ...found,
+          createdAt: found.createdAt.toISOString(),
+          reviewedAt: found.reviewedAt ? found.reviewedAt.toISOString() : null,
+        };
+      }
+    } catch (err) {
+      console.error("[track] lookup error:", err);
+      initialError = "Database is currently unavailable. Try again shortly.";
     }
   }
 

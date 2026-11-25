@@ -66,13 +66,26 @@ describe("PostgreSQL serverless connection & cold-start recovery", () => {
     expect(recovered).toBeDefined();
   });
 
-  it("enables TLS pool config automatically for Supabase pooler connection URLs", async () => {
+  it("enables TLS pool config automatically for Supabase pooler connection URLs and strips sslmode=require", async () => {
     process.env.DATABASE_URL =
-      '"postgresql://postgres.aeoabqclvusqdzktdcwj:secret@aws-0-ap-south-1.pooler.supabase.com:6543/postgres"';
+      '"postgresql://postgres.aeoabqclvusqdzktdcwj:secret@aws-0-ap-south-1.pooler.supabase.com:6543/postgres?sslmode=require"';
     mockQuery.mockResolvedValueOnce({ rows: [{ tbl: "papers" }] });
 
     await getDb();
     expect(poolConfigs[0]?.ssl).toEqual({ rejectUnauthorized: false });
+    expect(String(poolConfigs[0]?.connectionString)).not.toContain("sslmode=require");
     expect(mockOn).toHaveBeenCalledWith("error", expect.any(Function));
+  });
+
+  it("fails fast with clear message when Vercel runs without Postgres DATABASE_URL", async () => {
+    const prevVercel = process.env.VERCEL;
+    process.env.VERCEL = "1";
+    delete process.env.DATABASE_URL;
+    try {
+      await expect(getDb()).rejects.toThrow(/DATABASE_URL is not configured for Vercel/i);
+    } finally {
+      if (prevVercel === undefined) delete process.env.VERCEL;
+      else process.env.VERCEL = prevVercel;
+    }
   });
 });

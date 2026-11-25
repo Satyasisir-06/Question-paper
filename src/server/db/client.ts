@@ -38,6 +38,13 @@ function resolvePgSslOption(url: string): { rejectUnauthorized: boolean } | unde
   return undefined;
 }
 
+function normalizePgConnectionString(url: string, hasCustomSsl: boolean): string {
+  if (!hasCustomSsl) return url;
+  return url
+    .replace(/([?&])sslmode=(?:require|prefer)(&|$)/i, "$1")
+    .replace(/[?&]$/, "");
+}
+
 async function initDb(): Promise<AppDb> {
   const url = cleanEnvValue(process.env.DATABASE_URL) || "pglite://./data/pgdata";
 
@@ -48,8 +55,9 @@ async function initDb(): Promise<AppDb> {
     ]);
 
     const ssl = resolvePgSslOption(url);
+    const connectionString = normalizePgConnectionString(url, Boolean(ssl));
     const pool = new PgPool({
-      connectionString: url,
+      connectionString,
       max: 5,
       idleTimeoutMillis: 20_000,
       connectionTimeoutMillis: 10_000,
@@ -80,6 +88,12 @@ async function initDb(): Promise<AppDb> {
       await ensureCoreCatalog(pgDb);
     }
     return pgDb;
+  }
+
+  if (process.env.VERCEL === "1" || process.env.VERCEL_ENV) {
+    throw new Error(
+      "DATABASE_URL is not configured for Vercel. Set DATABASE_URL to your PostgreSQL URL in Vercel Project Settings -> Environment Variables."
+    );
   }
 
   const [{ PGlite: PGliteClient }, { drizzle: drizzlePglite }] =

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { AppDb } from "@/server/db/client";
-import type { StorageProvider } from "@/server/storage";
+import { getStorageProvider, type StorageProvider } from "@/server/storage";
 import { PaperRepository } from "@/server/repositories/paperRepo";
 import { CatalogRepository } from "@/server/repositories/catalogRepo";
 import { validatePdfBuffer } from "@/server/validators/pdfValidator";
@@ -45,7 +45,7 @@ export class UploadService {
 
   constructor(
     db: AppDb,
-    private readonly storage: StorageProvider
+    private readonly storage?: StorageProvider
   ) {
     this.paperRepo = new PaperRepository(db);
     this.catalogRepo = new CatalogRepository(db);
@@ -96,7 +96,8 @@ export class UploadService {
     const storageKey = `quarantine/${objectId}.pdf`;
     const trackingCode = generateTrackingCode();
 
-    await this.storage.putObject(storageKey, input.fileBytes, "application/pdf");
+    const storage = this.storage ?? getStorageProvider();
+    await storage.putObject(storageKey, input.fileBytes, "application/pdf");
 
     const inserted = await this.paperRepo.insertPaper({
       trackingCode,

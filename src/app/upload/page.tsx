@@ -2,16 +2,23 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { getDb } from "@/server/db/client";
-import { getStorageProvider } from "@/server/storage";
 import { PaperService } from "@/server/services/paperService";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { UploadFormClient } from "@/components/upload/UploadFormClient";
 import type { ExamTypeValue } from "@/lib/btech";
+import type { FilterCatalogDto } from "@/types/paper";
 
 export const metadata: Metadata = {
   title: "Upload Question Paper",
   description:
-    "Submit a B.Tech question paper PDF for exam admin verification before public release.",
+    "Submit a B.Tech question paper PDF or photo for exam admin verification before public release.",
+};
+
+const EMPTY_CATALOG: FilterCatalogDto = {
+  branches: [],
+  regulations: [],
+  subjects: [],
+  examYears: [],
 };
 
 async function UploadPageBody({
@@ -20,15 +27,40 @@ async function UploadPageBody({
   searchParamsPromise: Promise<Record<string, string | string[] | undefined>>;
 }) {
   await connection();
-  const [sp, db] = await Promise.all([searchParamsPromise, getDb()]);
-  const service = new PaperService(db, getStorageProvider());
-  const catalog = await service.getFilters();
+  const sp = await searchParamsPromise;
+
+  let catalog: FilterCatalogDto = EMPTY_CATALOG;
+  let dbError = "";
+  try {
+    const db = await getDb();
+    const service = new PaperService(db);
+    catalog = await service.getFilters();
+  } catch (err) {
+    console.error("[upload] catalog load error:", err);
+    dbError = "Database is currently unreachable. Check DATABASE_URL in Vercel settings.";
+  }
 
   const yearNum = Number(sp.year);
   const semNum = Number(sp.sem);
   const examRaw = typeof sp.examType === "string" ? sp.examType : undefined;
   const examType =
     examRaw === "REGULAR" || examRaw === "SUPPLY" ? (examRaw as ExamTypeValue) : undefined;
+
+  if (dbError) {
+    return (
+      <div
+        role="alert"
+        className="max-w-2xl mx-auto rounded-2xl p-6 body-6"
+        style={{
+          backgroundColor: "var(--badge-rejected-bg)",
+          color: "var(--badge-rejected-text)",
+          border: "1px solid var(--badge-rejected-border)",
+        }}
+      >
+        {dbError}
+      </div>
+    );
+  }
 
   return (
     <UploadFormClient

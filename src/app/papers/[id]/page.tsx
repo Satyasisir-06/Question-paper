@@ -6,7 +6,6 @@ import { connection } from "next/server";
 import { z } from "zod";
 import { ArrowLeft, DownloadSimple } from "@phosphor-icons/react/dist/ssr";
 import { getDb } from "@/server/db/client";
-import { getStorageProvider } from "@/server/storage";
 import { PaperService } from "@/server/services/paperService";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ExamTypeBadge } from "@/components/ui/ExamBadge";
@@ -28,21 +27,25 @@ export async function generateMetadata({
     return { title: "Question paper not found" };
   }
 
-  const db = await getDb();
-  const service = new PaperService(db, getStorageProvider());
-  const paper = await service.getApprovedPaper(id);
-  if (!paper) {
-    return { title: "Question paper not found" };
+  try {
+    const db = await getDb();
+    const service = new PaperService(db);
+    const paper = await service.getApprovedPaper(id);
+    if (!paper) {
+      return { title: "Question paper not found" };
+    }
+
+    const yearSem = formatYearSemCode(paper.yearOfStudy, paper.semester);
+    const examLabel = EXAM_TYPE_META[paper.examType].label;
+    const session = `${formatExamMonth(paper.examMonth)} ${paper.examYear}`;
+
+    return {
+      title: `${paper.subjectCode} ${paper.subjectName} (${examLabel} ${session})`,
+      description: `Preview and download B.Tech ${paper.branchCode} ${yearSem} ${paper.subjectCode} ${paper.subjectName} ${examLabel} question paper (${session}, ${paper.regulationCode}).`,
+    };
+  } catch {
+    return { title: "Question paper preview" };
   }
-
-  const yearSem = formatYearSemCode(paper.yearOfStudy, paper.semester);
-  const examLabel = EXAM_TYPE_META[paper.examType].label;
-  const session = `${formatExamMonth(paper.examMonth)} ${paper.examYear}`;
-
-  return {
-    title: `${paper.subjectCode} ${paper.subjectName} (${examLabel} ${session})`,
-    description: `Preview and download B.Tech ${paper.branchCode} ${yearSem} ${paper.subjectCode} ${paper.subjectName} ${examLabel} question paper (${session}, ${paper.regulationCode}).`,
-  };
 }
 
 async function PaperDetailContent({
@@ -57,7 +60,7 @@ async function PaperDetailContent({
   }
 
   const db = await getDb();
-  const service = new PaperService(db, getStorageProvider());
+  const service = new PaperService(db);
   const paper = await service.getApprovedPaper(id);
   if (!paper) {
     notFound();
