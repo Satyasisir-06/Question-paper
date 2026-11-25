@@ -16,7 +16,12 @@ export interface SessionUser {
 }
 
 function getSecretKey(): Uint8Array {
-  const raw = process.env.SESSION_SECRET;
+  const rawTrimmed = process.env.SESSION_SECRET?.trim() ?? "";
+  const raw =
+    (rawTrimmed.startsWith('"') && rawTrimmed.endsWith('"')) ||
+    (rawTrimmed.startsWith("'") && rawTrimmed.endsWith("'"))
+      ? rawTrimmed.slice(1, -1).trim()
+      : rawTrimmed;
   if (raw && raw.length >= 32) {
     return new TextEncoder().encode(raw);
   }

@@ -242,9 +242,9 @@ export async function seedDatabase(
     .returning();
   const subjectByCode = new Map(subjectRows.map((s) => [s.code, s]));
 
-  const adminEmail = process.env.ADMIN_SEED_EMAIL?.trim() || "admin@college.edu";
-  const adminPassword = process.env.ADMIN_SEED_PASSWORD?.trim() || "Admin@12345";
-  const adminName = process.env.ADMIN_SEED_NAME?.trim() || "Exam Cell Admin";
+  const adminEmail = cleanSeedEnv(process.env.ADMIN_SEED_EMAIL) || "admin@college.edu";
+  const adminPassword = cleanSeedEnv(process.env.ADMIN_SEED_PASSWORD) || "Admin@12345";
+  const adminName = cleanSeedEnv(process.env.ADMIN_SEED_NAME) || "Exam Cell Admin";
   const passwordHash = await hashPassword(adminPassword);
 
   const [adminUser] = await db
@@ -354,6 +354,17 @@ export async function syncDefaultBranches(db: AppDb): Promise<void> {
   }
 }
 
+function cleanSeedEnv(value?: string): string {
+  const trimmed = value?.trim() ?? "";
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return trimmed;
+}
+
 /**
  * Idempotently ensure baseline B.Tech branches, regulations, starter subjects,
  * and optional configured admin account exist on empty remote PostgreSQL deployments.
@@ -402,8 +413,8 @@ export async function ensureCoreCatalog(db: AppDb): Promise<void> {
     }
   }
 
-  const configuredEmail = process.env.ADMIN_SEED_EMAIL?.trim().toLowerCase();
-  const configuredPassword = process.env.ADMIN_SEED_PASSWORD?.trim();
+  const configuredEmail = cleanSeedEnv(process.env.ADMIN_SEED_EMAIL).toLowerCase();
+  const configuredPassword = cleanSeedEnv(process.env.ADMIN_SEED_PASSWORD);
   if (configuredEmail && configuredPassword) {
     const existingUsers = await db.select({ value: count() }).from(users);
     if ((existingUsers[0]?.value ?? 0) === 0) {
@@ -412,7 +423,7 @@ export async function ensureCoreCatalog(db: AppDb): Promise<void> {
         .insert(users)
         .values({
           email: configuredEmail,
-          name: process.env.ADMIN_SEED_NAME?.trim() || "Exam Cell Admin",
+          name: cleanSeedEnv(process.env.ADMIN_SEED_NAME) || "Exam Cell Admin",
           passwordHash,
           role: "ADMIN",
         })
@@ -423,18 +434,18 @@ export async function ensureCoreCatalog(db: AppDb): Promise<void> {
 
 /** Ensure admin user exists without wiping existing papers. */
 export async function ensureAdminUser(db: AppDb): Promise<void> {
-  const email = (process.env.ADMIN_SEED_EMAIL?.trim() || "admin@college.edu").toLowerCase();
+  const email = (cleanSeedEnv(process.env.ADMIN_SEED_EMAIL) || "admin@college.edu").toLowerCase();
   const existing = await db.select().from(users).where(eq(users.email, email));
   if (existing.length > 0) return;
 
   const passwordHash = await hashPassword(
-    process.env.ADMIN_SEED_PASSWORD?.trim() || "Admin@12345"
+    cleanSeedEnv(process.env.ADMIN_SEED_PASSWORD) || "Admin@12345"
   );
   await db
     .insert(users)
     .values({
       email,
-      name: process.env.ADMIN_SEED_NAME?.trim() || "Exam Cell Admin",
+      name: cleanSeedEnv(process.env.ADMIN_SEED_NAME) || "Exam Cell Admin",
       passwordHash,
       role: "ADMIN",
     })

@@ -9,28 +9,40 @@ import {
 import { Readable } from "node:stream";
 import { assertSafeStorageKey, type StorageProvider } from "./storageProvider";
 
+function cleanEnvValue(value?: string): string {
+  const trimmed = value?.trim() ?? "";
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return trimmed;
+}
+
 /** S3 / Cloudflare R2 object storage adapter for production deployments. */
 export class S3StorageProvider implements StorageProvider {
   private readonly client: S3Client;
   private readonly bucket: string;
 
   constructor() {
-    const bucket = process.env.S3_BUCKET;
-    const accessKeyId = process.env.S3_ACCESS_KEY_ID;
-    const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
+    const bucket = cleanEnvValue(process.env.S3_BUCKET);
+    const accessKeyId = cleanEnvValue(process.env.S3_ACCESS_KEY_ID);
+    const secretAccessKey = cleanEnvValue(process.env.S3_SECRET_ACCESS_KEY);
     if (!bucket || !accessKeyId || !secretAccessKey) {
       throw new Error(
         "S3_BUCKET, S3_ACCESS_KEY_ID, and S3_SECRET_ACCESS_KEY are required when STORAGE_PROVIDER=s3."
       );
     }
-    const endpoint = process.env.S3_ENDPOINT?.trim() || undefined;
+    const endpoint = cleanEnvValue(process.env.S3_ENDPOINT) || undefined;
+    const region = cleanEnvValue(process.env.S3_REGION) || "auto";
     const forcePathStyle =
-      process.env.S3_FORCE_PATH_STYLE === "true" ||
+      cleanEnvValue(process.env.S3_FORCE_PATH_STYLE) === "true" ||
       Boolean(endpoint && /\.supabase\.(?:co|in)/i.test(endpoint));
 
     this.bucket = bucket;
     this.client = new S3Client({
-      region: process.env.S3_REGION ?? "auto",
+      region,
       endpoint,
       forcePathStyle,
       credentials: { accessKeyId, secretAccessKey },

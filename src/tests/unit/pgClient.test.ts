@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { closeDb, getDb } from "@/server/db/client";
 
-const { mockQuery, mockEnd, poolConfigs } = vi.hoisted(() => ({
+const { mockQuery, mockEnd, mockOn, poolConfigs } = vi.hoisted(() => ({
   mockQuery: vi.fn(),
   mockEnd: vi.fn(),
+  mockOn: vi.fn(),
   poolConfigs: [] as Array<Record<string, unknown>>,
 }));
 
@@ -11,6 +12,7 @@ vi.mock("pg", () => {
   class MockPool {
     query = mockQuery;
     end = mockEnd;
+    on = mockOn;
     constructor(config: Record<string, unknown>) {
       poolConfigs.push(config);
     }
@@ -66,10 +68,11 @@ describe("PostgreSQL serverless connection & cold-start recovery", () => {
 
   it("enables TLS pool config automatically for Supabase pooler connection URLs", async () => {
     process.env.DATABASE_URL =
-      "postgresql://postgres.aeoabqclvusqdzktdcwj:secret@aws-0-ap-south-1.pooler.supabase.com:6543/postgres";
+      '"postgresql://postgres.aeoabqclvusqdzktdcwj:secret@aws-0-ap-south-1.pooler.supabase.com:6543/postgres"';
     mockQuery.mockResolvedValueOnce({ rows: [{ tbl: "papers" }] });
 
     await getDb();
     expect(poolConfigs[0]?.ssl).toEqual({ rejectUnauthorized: false });
+    expect(mockOn).toHaveBeenCalledWith("error", expect.any(Function));
   });
 });

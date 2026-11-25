@@ -1,12 +1,20 @@
+import fs from "node:fs";
+import path from "node:path";
 import { closeDb, getDb } from "./client";
-import { seedDatabase, syncDefaultBranches } from "./seedData";
+import { ensureAdminUser, seedDatabase, syncDefaultBranches } from "./seedData";
 import { getStorageProvider } from "@/server/storage";
 
 async function runSeed() {
+  const envPath = path.resolve(".env");
+  if (fs.existsSync(envPath) && typeof process.loadEnvFile === "function") {
+    process.loadEnvFile(envPath);
+  }
+
   const db = await getDb();
   const storage = getStorageProvider();
   await seedDatabase(db, storage);
   await syncDefaultBranches(db);
+  await ensureAdminUser(db);
   console.log("Seed completed successfully.");
 }
 

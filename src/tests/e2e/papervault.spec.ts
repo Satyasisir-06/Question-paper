@@ -1,5 +1,27 @@
 import { expect, test } from "@playwright/test";
+import fs from "node:fs";
+import path from "node:path";
 import { PDFDocument } from "pdf-lib";
+
+function getLocalAdminCredentials(): { email: string; password: string } {
+  let email = process.env.ADMIN_SEED_EMAIL?.trim() || "";
+  let password = process.env.ADMIN_SEED_PASSWORD?.trim() || "";
+
+  if ((!email || !password) && fs.existsSync(path.resolve(".env"))) {
+    const rawEnv = fs.readFileSync(path.resolve(".env"), "utf8");
+    for (const line of rawEnv.split(/\r?\n/)) {
+      const m = line.match(/^(ADMIN_SEED_EMAIL|ADMIN_SEED_PASSWORD)\s*=\s*"?(.*?)"?\s*$/);
+      if (!m) continue;
+      if (m[1] === "ADMIN_SEED_EMAIL" && !email) email = m[2].trim();
+      if (m[1] === "ADMIN_SEED_PASSWORD" && !password) password = m[2].trim();
+    }
+  }
+
+  return {
+    email: email || "admin@college.edu",
+    password: password || "Admin@12345",
+  };
+}
 
 async function createSamplePdfBuffer(label: string): Promise<Buffer> {
   const doc = await PDFDocument.create();
@@ -136,9 +158,10 @@ test.describe("B.Tech PaperVault E2E journeys", () => {
     const preJson = await preSearch.json();
     expect(preJson.data).toHaveLength(0);
 
+    const adminCreds = getLocalAdminCredentials();
     await page.goto("/admin/login");
-    await page.locator("#admin-email").fill("admin@college.edu");
-    await page.locator("#admin-password").fill("Admin@12345");
+    await page.locator("#admin-email").fill(adminCreds.email);
+    await page.locator("#admin-password").fill(adminCreds.password);
     await page.getByRole("button", { name: "Sign in to admin console" }).click();
 
     await page.waitForURL("**/admin/queue");
@@ -164,7 +187,14 @@ test.describe("B.Tech PaperVault E2E journeys", () => {
 
   test("displays all 8 college branches and auto-scans PDF & photo uploads for subject code and name", async ({
     page,
+    request,
   }) => {
+    const healthRes = await request.get("/api/v1/health");
+    expect(healthRes.status()).toBe(200);
+    const healthJson = await healthRes.json();
+    expect(healthJson.ok).toBe(true);
+    expect(healthJson.dbConnected).toBe(true);
+
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
 

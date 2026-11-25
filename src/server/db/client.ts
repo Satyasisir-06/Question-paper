@@ -16,6 +16,17 @@ const globalForDb = globalThis as unknown as {
   __pvPgPool?: Pool;
 };
 
+function cleanEnvValue(value?: string): string {
+  const trimmed = value?.trim() ?? "";
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return trimmed;
+}
+
 function resolvePgSslOption(url: string): { rejectUnauthorized: boolean } | undefined {
   if (/localhost|127\.0\.0\.1/i.test(url)) return undefined;
   if (/sslmode=(?:disable|verify-full|verify-ca)|sslrootcert=/i.test(url)) {
@@ -28,7 +39,7 @@ function resolvePgSslOption(url: string): { rejectUnauthorized: boolean } | unde
 }
 
 async function initDb(): Promise<AppDb> {
-  const url = process.env.DATABASE_URL?.trim() || "pglite://./data/pgdata";
+  const url = cleanEnvValue(process.env.DATABASE_URL) || "pglite://./data/pgdata";
 
   if (url.startsWith("postgres://") || url.startsWith("postgresql://")) {
     const [{ Pool: PgPool }, { drizzle: drizzlePg }] = await Promise.all([
@@ -43,6 +54,9 @@ async function initDb(): Promise<AppDb> {
       idleTimeoutMillis: 20_000,
       connectionTimeoutMillis: 10_000,
       ...(ssl ? { ssl } : {}),
+    });
+    pool.on("error", (err) => {
+      console.error("[db] pg pool idle client error:", err.message);
     });
     globalForDb.__pvPgPool = pool;
 
@@ -92,6 +106,10 @@ export async function getDb(): Promise<AppDb> {
   if (!globalForDb.__pvDbPromise) {
     globalForDb.__pvDbPromise = initDb().catch((err) => {
       globalForDb.__pvDbPromise = undefined;
+      console.error(
+        "[db] initialization error:",
+        err instanceof Error ? err.message : String(err)
+      );
       throw err;
     });
   }
