@@ -60,6 +60,19 @@ export const approvePaperSchema = z
     branchId: z.string().uuid().optional(),
     regulationId: z.string().uuid().optional(),
     subjectId: z.string().uuid().optional(),
+    subjectCode: z
+      .string()
+      .trim()
+      .min(2, "Subject code must be at least 2 characters.")
+      .max(24)
+      .toUpperCase()
+      .optional(),
+    subjectName: z
+      .string()
+      .trim()
+      .min(2, "Subject name must be at least 2 characters.")
+      .max(160)
+      .optional(),
     yearOfStudy: z.coerce.number().int().min(1).max(4).optional(),
     semester: z.coerce.number().int().min(1).max(8).optional(),
     examType: examTypeSchema.optional(),
@@ -139,3 +152,19 @@ export const createSubjectSchema = z
       });
     }
   });
+
+export const updateSubjectSchema = z.object({
+  id: z.string().uuid("Select a valid subject."),
+  code: z
+    .string()
+    .trim()
+    .min(2, "Subject code must be at least 2 characters.")
+    .max(24)
+    .toUpperCase()
+    .optional(),
+  name: z
+    .string()
+    .trim()
+    .min(2, "Subject name must be at least 2 characters.")
+    .max(160),
+});

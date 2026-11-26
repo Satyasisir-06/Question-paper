@@ -176,6 +176,17 @@ test.describe("B.Tech PaperVault E2E journeys", () => {
       page.getByText(`Paper ${trackingCode!} approved and published`)
     ).toBeVisible();
 
+    // Edit subject name & code after publish from the Published tab
+    await page.getByRole("tab", { name: "Published" }).click();
+    await page.getByRole("searchbox", { name: "Filter moderation papers" }).fill(trackingCode!);
+    await page.getByRole("button", { name: new RegExp(trackingCode!) }).click();
+    await page.locator("#mod-subject-code").fill("CS498");
+    await page.locator("#mod-subject-name").fill("Edited Subject Name E2E");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(
+      page.getByText(`Updated published paper ${trackingCode!} (CS498 — Edited Subject Name E2E)`)
+    ).toBeVisible();
+
     await page.goto(`/track?code=${encodeURIComponent(trackingCode!)}`);
     await expect(page.getByText("Published", { exact: true })).toBeVisible();
 
@@ -184,6 +195,7 @@ test.describe("B.Tech PaperVault E2E journeys", () => {
       .getByRole("searchbox", { name: "Search subject code or name" })
       .fill(uniqueSet);
     await expect(page.getByText(uniqueSet).first()).toBeVisible();
+    await expect(page.getByText("Edited Subject Name E2E").first()).toBeVisible();
   });
 
   test("displays all 8 college branches and auto-scans PDF & photo uploads for subject code and name", async ({

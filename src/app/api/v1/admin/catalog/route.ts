@@ -8,6 +8,7 @@ import {
   createBranchSchema,
   createRegulationSchema,
   createSubjectSchema,
+  updateSubjectSchema,
 } from "@/server/validators/schemas";
 
 const catalogActionSchema = z.discriminatedUnion("kind", [
@@ -82,5 +83,42 @@ export async function POST(request: NextRequest) {
         ? "A matching branch, regulation, or subject already exists."
         : "Unable to save catalog entry.";
     return apiError("CATALOG_SAVE_FAILED", message, 409);
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  const auth = await requireAdminApi(request);
+  if (!auth.authorized) return auth.response;
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return apiError("INVALID_JSON", "Request body must be valid JSON.", 400);
+  }
+
+  const parsed = updateSubjectSchema.safeParse(body);
+  if (!parsed.success) {
+    return apiError(
+      "INVALID_SUBJECT_UPDATE",
+      parsed.error.issues[0]?.message ?? "Check subject code and name.",
+      400
+    );
+  }
+
+  try {
+    const db = await getDb();
+    const service = new CatalogService(db);
+    const updated = await service.updateSubject(parsed.data);
+    if (!updated) {
+      return apiError("NOT_FOUND", "Subject not found.", 404);
+    }
+    return apiSuccess(updated);
+  } catch (err) {
+    const message =
+      err instanceof Error && err.message.includes("unique")
+        ? "Another subject already uses that code for the same branch and regulation."
+        : "Unable to update subject.";
+    return apiError("SUBJECT_UPDATE_FAILED", message, 409);
   }
 }

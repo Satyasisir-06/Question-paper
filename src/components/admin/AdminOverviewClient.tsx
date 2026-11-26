@@ -77,12 +77,21 @@ export function AdminOverviewClient({
             Moderation workload, semester coverage, and reported papers
           </p>
         </div>
-        <Link
-          href="/admin/queue"
-          className="inline-flex items-center h-10 px-4 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8]"
-        >
-          Open moderation queue ({initialData.kpis.pendingCount})
-        </Link>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Link
+            href="/admin/queue?status=APPROVED"
+            className="inline-flex items-center h-10 px-4 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-primary)] hover:bg-[var(--surface-raised)]"
+            style={{ border: "1px solid var(--border-primary)" }}
+          >
+            Edit published papers
+          </Link>
+          <Link
+            href="/admin/queue"
+            className="inline-flex items-center h-10 px-4 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8]"
+          >
+            Open moderation queue ({initialData.kpis.pendingCount})
+          </Link>
+        </div>
       </div>
 
       <section

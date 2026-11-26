@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Readable } from "node:stream";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { AppDb } from "@/server/db/client";
 import { auditLogs, branches, papers, subjects } from "@/server/db/schema";
 import type { StorageProvider } from "@/server/storage";
@@ -64,6 +64,8 @@ export class ModerationService {
       branchId?: string;
       regulationId?: string;
       subjectId?: string;
+      subjectCode?: string;
+      subjectName?: string;
       yearOfStudy?: number;
       semester?: number;
       examType?: ExamTypeValue;
@@ -79,7 +81,7 @@ export class ModerationService {
 
     const nextBranchId = input.updates?.branchId ?? existing.branchId;
     const nextRegId = input.updates?.regulationId ?? existing.regulationId;
-    const nextSubjectId = input.updates?.subjectId ?? existing.subjectId;
+    const selectedSubjectId = input.updates?.subjectId ?? existing.subjectId;
     const nextYear = input.updates?.yearOfStudy ?? existing.yearOfStudy;
     const nextSem = input.updates?.semester ?? existing.semester;
     const nextExamType = input.updates?.examType ?? existing.examType;
@@ -92,26 +94,98 @@ export class ModerationService {
       .select()
       .from(branches)
       .where(eq(branches.id, nextBranchId));
-    const [subjectRow] = await this.db
+    const [selectedSubjectRow] = await this.db
       .select()
       .from(subjects)
-      .where(eq(subjects.id, nextSubjectId));
+      .where(eq(subjects.id, selectedSubjectId));
+
+    if (!selectedSubjectRow) {
+      throw new UploadValidationError(
+        "INVALID_CATALOG_REF",
+        "Selected subject does not exist.",
+        400
+      );
+    }
+
+    const requestedCode = input.updates?.subjectCode?.trim().toUpperCase();
+    const requestedName = input.updates?.subjectName?.trim();
+    const targetCode = requestedCode || selectedSubjectRow.code;
+    const targetName = requestedName || selectedSubjectRow.name;
+    const sameSubjectAndScope =
+      targetCode === selectedSubjectRow.code &&
+      nextBranchId === existing.branchId &&
+      nextRegId === existing.regulationId;
 
     const branchCode = sanitizePathSegment(branchRow?.code ?? existing.branchCode);
-    const subjectCode = sanitizePathSegment(subjectRow?.code ?? existing.subjectCode);
-    const publishedKey = `published/${branchCode}/${nextYear}-${nextSem}/${nextExamType}/${subjectCode}_${nextExamYear}_${existing.trackingCode}.pdf`;
+    const subjectCodeSegment = sanitizePathSegment(targetCode);
+    const publishedKey = `published/${branchCode}/${nextYear}-${nextSem}/${nextExamType}/${subjectCodeSegment}_${nextExamYear}_${existing.trackingCode}.pdf`;
 
     if (existing.storageKey !== publishedKey && (await this.storage.exists(existing.storageKey))) {
       await this.storage.moveObject(existing.storageKey, publishedKey);
     }
 
+    const wasAlreadyApproved = existing.status === "APPROVED";
+
     const updated = await this.db.transaction(async (tx) => {
+      let resolvedSubjectId = selectedSubjectRow.id;
+      let resolvedSubjectCode = selectedSubjectRow.code;
+      let resolvedSubjectName = selectedSubjectRow.name;
+
+      if (sameSubjectAndScope) {
+        if (requestedName && requestedName !== selectedSubjectRow.name) {
+          await tx
+            .update(subjects)
+            .set({ name: requestedName })
+            .where(eq(subjects.id, selectedSubjectRow.id));
+          resolvedSubjectName = requestedName;
+        }
+      } else {
+        const [matched] = await tx
+          .select()
+          .from(subjects)
+          .where(
+            and(
+              eq(subjects.code, targetCode),
+              eq(subjects.branchId, nextBranchId),
+              eq(subjects.regulationId, nextRegId)
+            )
+          );
+
+        if (matched) {
+          resolvedSubjectId = matched.id;
+          resolvedSubjectCode = matched.code;
+          resolvedSubjectName = requestedName || matched.name;
+          if (requestedName && requestedName !== matched.name) {
+            await tx
+              .update(subjects)
+              .set({ name: requestedName })
+              .where(eq(subjects.id, matched.id));
+          }
+        } else {
+          const [created] = await tx
+            .insert(subjects)
+            .values({
+              code: targetCode,
+              name: targetName,
+              branchId: nextBranchId,
+              regulationId: nextRegId,
+              yearOfStudy: nextYear,
+              semester: nextSem,
+              isCommonFirstYear: nextYear === 1,
+            })
+            .returning();
+          resolvedSubjectId = created.id;
+          resolvedSubjectCode = created.code;
+          resolvedSubjectName = created.name;
+        }
+      }
+
       const [row] = await tx
         .update(papers)
         .set({
           branchId: nextBranchId,
           regulationId: nextRegId,
-          subjectId: nextSubjectId,
+          subjectId: resolvedSubjectId,
           yearOfStudy: nextYear,
           semester: nextSem,
           examType: nextExamType,
@@ -130,12 +204,16 @@ export class ModerationService {
 
       await tx.insert(auditLogs).values({
         actorId: input.adminUserId,
-        action: "APPROVE",
+        action: wasAlreadyApproved ? "UPDATE_PUBLISHED" : "APPROVE",
         entityType: "paper",
         entityId: input.paperId,
         metadataJson: {
           trackingCode: existing.trackingCode,
           previousStatus: existing.status,
+          previousSubjectCode: existing.subjectCode,
+          previousSubjectName: existing.subjectName,
+          subjectCode: resolvedSubjectCode,
+          subjectName: resolvedSubjectName,
           examType: nextExamType,
           yearOfStudy: nextYear,
           semester: nextSem,
@@ -143,7 +221,11 @@ export class ModerationService {
         ipAddress: input.ipAddress,
       });
 
-      return row;
+      return {
+        ...row,
+        subjectCode: resolvedSubjectCode,
+        subjectName: resolvedSubjectName,
+      };
     });
 
     return updated;

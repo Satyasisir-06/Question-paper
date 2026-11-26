@@ -6,6 +6,7 @@ import {
   CaretRight,
   CheckCircle,
   MagicWand,
+  MagnifyingGlass,
   WarningCircle,
   XCircle,
 } from "@phosphor-icons/react";
@@ -18,6 +19,7 @@ import {
 } from "@/lib/btech";
 import { ExamTypeBadge, StatusBadge } from "@/components/ui/ExamBadge";
 import { PdfViewer } from "@/components/pdf/PdfViewer";
+import { PaperCardListSkeleton } from "@/components/ui/Skeletons";
 import { scanPaperFileInBrowser } from "@/lib/browserPaperTools";
 import { safeReadApiJson } from "@/lib/httpClient";
 
@@ -78,6 +80,8 @@ function QueueInspector({
   const [editYear, setEditYear] = useState(activeItem.yearOfStudy);
   const [editSem, setEditSem] = useState(activeItem.semester);
   const [editSubjectId, setEditSubjectId] = useState(activeItem.subjectId);
+  const [editSubjectCode, setEditSubjectCode] = useState(activeItem.subjectCode);
+  const [editSubjectName, setEditSubjectName] = useState(activeItem.subjectName);
   const [editExamType, setEditExamType] = useState<ExamTypeValue>(
     activeItem.examType
   );
@@ -120,7 +124,17 @@ function QueueInspector({
       }
       if (m.branchId) setEditBranchId(m.branchId);
       if (m.regulationId) setEditRegulationId(m.regulationId);
-      if (m.subjectId) setEditSubjectId(m.subjectId);
+      if (m.subjectId) {
+        setEditSubjectId(m.subjectId);
+        const found = catalog.subjects.find((s) => s.id === m.subjectId);
+        if (found) {
+          setEditSubjectCode(found.code);
+          setEditSubjectName(found.name);
+        }
+      } else {
+        if (m.subjectCode) setEditSubjectCode(m.subjectCode);
+        if (m.subjectName) setEditSubjectName(m.subjectName);
+      }
       if (m.examType) setEditExamType(m.examType);
       if (m.examMonth) setEditExamMonth(m.examMonth);
       if (m.examYear) setEditExamYear(m.examYear);
@@ -145,6 +159,13 @@ function QueueInspector({
   };
 
   const handleApprove = async () => {
+    const cleanCode = editSubjectCode.trim().toUpperCase();
+    const cleanName = editSubjectName.trim();
+    if (cleanCode.length < 2 || cleanName.length < 2) {
+      onFeedback("Enter both a valid subject code and subject name.");
+      return;
+    }
+
     setActionBusy(true);
     onFeedback("");
     try {
@@ -155,6 +176,8 @@ function QueueInspector({
           branchId: editBranchId,
           regulationId: editRegulationId,
           subjectId: editSubjectId,
+          subjectCode: cleanCode,
+          subjectName: cleanName,
           yearOfStudy: editYear,
           semester: editSem,
           examType: editExamType,
@@ -163,12 +186,16 @@ function QueueInspector({
           setLabel: editSetLabel.trim() || null,
         }),
       });
-      const parsed = await safeReadApiJson(res, "Unable to approve submission.");
+      const parsed = await safeReadApiJson(res, "Unable to save paper changes.");
       if (!parsed.ok) {
         onFeedback(parsed.errorMessage);
         return;
       }
-      onFeedback(`Paper ${activeItem.trackingCode} approved and published`);
+      onFeedback(
+        statusTab === "APPROVED"
+          ? `Updated published paper ${activeItem.trackingCode} (${cleanCode} — ${cleanName})`
+          : `Paper ${activeItem.trackingCode} approved and published`
+      );
       await onDone();
     } finally {
       setActionBusy(false);
@@ -237,7 +264,9 @@ function QueueInspector({
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="heading-6 text-[var(--text-primary)]">
-            Verify paper metadata
+            {statusTab === "APPROVED"
+              ? "Edit published paper"
+              : "Verify paper metadata"}
           </h2>
           <button
             type="button"
@@ -362,12 +391,24 @@ function QueueInspector({
         </div>
 
         <div>
-          <label className="block caption-4 text-[var(--text-muted)] mb-1">
-            Subject
+          <label
+            htmlFor="mod-subject-select"
+            className="block caption-4 text-[var(--text-muted)] mb-1"
+          >
+            Catalog subject
           </label>
           <select
+            id="mod-subject-select"
             value={editSubjectId}
-            onChange={(e) => setEditSubjectId(e.target.value)}
+            onChange={(e) => {
+              const nextId = e.target.value;
+              setEditSubjectId(nextId);
+              const match = catalog.subjects.find((s) => s.id === nextId);
+              if (match) {
+                setEditSubjectCode(match.code);
+                setEditSubjectName(match.name);
+              }
+            }}
             className="w-full h-10 px-2.5 rounded-lg text-base sm:text-sm bg-[var(--surface-raised)]"
             style={{ border: "1px solid var(--border-primary)" }}
           >
@@ -381,6 +422,45 @@ function QueueInspector({
             ))}
           </select>
         </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div>
+            <label
+              htmlFor="mod-subject-code"
+              className="block caption-4 text-[var(--text-muted)] mb-1"
+            >
+              Subject code
+            </label>
+            <input
+              id="mod-subject-code"
+              type="text"
+              value={editSubjectCode}
+              onChange={(e) => setEditSubjectCode(e.target.value.toUpperCase())}
+              className="w-full h-10 px-2.5 rounded-lg font-mono text-base sm:text-sm bg-[var(--surface-raised)]"
+              style={{ border: "1px solid var(--border-primary)" }}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label
+              htmlFor="mod-subject-name"
+              className="block caption-4 text-[var(--text-muted)] mb-1"
+            >
+              Subject name
+            </label>
+            <input
+              id="mod-subject-name"
+              type="text"
+              value={editSubjectName}
+              onChange={(e) => setEditSubjectName(e.target.value)}
+              placeholder="Enter subject name"
+              className="w-full h-10 px-2.5 rounded-lg text-base sm:text-sm bg-[var(--surface-raised)]"
+              style={{ border: "1px solid var(--border-primary)" }}
+            />
+          </div>
+        </div>
+        <p className="caption-5 text-[var(--text-muted)]">
+          Edit the subject name directly after publish, or change the code to assign a separate subject.
+        </p>
 
         <div className="grid grid-cols-3 gap-2">
           <div>
@@ -453,12 +533,22 @@ function QueueInspector({
         <div className="pt-2 flex flex-wrap items-center gap-2">
           <button
             type="button"
-            disabled={actionBusy}
+            disabled={
+              actionBusy ||
+              editSubjectCode.trim().length < 2 ||
+              editSubjectName.trim().length < 2
+            }
             onClick={() => void handleApprove()}
             className="flex-1 inline-flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-lg button-sm text-white bg-[#16A34A] hover:bg-[#15803D] active:scale-[0.98] disabled:opacity-60 cursor-pointer"
           >
             <CheckCircle size={17} weight="regular" />
-            <span>Approve and publish</span>
+            <span>
+              {actionBusy
+                ? "Saving..."
+                : statusTab === "APPROVED"
+                  ? "Save changes"
+                  : "Approve and publish"}
+            </span>
           </button>
 
           {statusTab !== "REJECTED" && (
@@ -532,24 +622,31 @@ function QueueInspector({
 export function ModerationWorkbenchClient({
   catalog,
   initialItems,
+  initialStatus = "PENDING",
 }: {
   catalog: FilterCatalogDto;
   initialItems: AdminQueueItemDto[];
+  initialStatus?: PaperStatusValue;
 }) {
-  const [statusTab, setStatusTab] = useState<PaperStatusValue>("PENDING");
+  const [liveCatalog, setLiveCatalog] = useState<FilterCatalogDto>(catalog);
+  const [statusTab, setStatusTab] = useState<PaperStatusValue>(initialStatus);
   const [items, setItems] = useState<AdminQueueItemDto[]>(initialItems);
   const [selectedId, setSelectedId] = useState<string | null>(
     initialItems[0]?.id ?? null
   );
+  const [filterQuery, setFilterQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
 
-  const loadQueue = async (tab: PaperStatusValue) => {
+  const refreshQueueAndCatalog = async (tab: PaperStatusValue) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/v1/admin/papers?status=${tab}`);
+      const [queueRes, catRes] = await Promise.all([
+        fetch(`/api/v1/admin/papers?status=${tab}`),
+        fetch("/api/v1/admin/catalog"),
+      ]);
       const parsed = await safeReadApiJson<AdminQueueItemDto[]>(
-        res,
+        queueRes,
         "Unable to load moderation queue."
       );
       if (parsed.ok && parsed.data) {
@@ -561,6 +658,13 @@ export function ModerationWorkbenchClient({
       } else if (!parsed.ok) {
         setFeedback(parsed.errorMessage);
       }
+      const catParsed = await safeReadApiJson<FilterCatalogDto>(
+        catRes,
+        "Unable to refresh subject catalog."
+      );
+      if (catParsed.ok && catParsed.data) {
+        setLiveCatalog(catParsed.data);
+      }
     } finally {
       setLoading(false);
     }
@@ -568,12 +672,25 @@ export function ModerationWorkbenchClient({
 
   const handleTabSwitch = (tab: PaperStatusValue) => {
     setStatusTab(tab);
+    setFilterQuery("");
     setFeedback("");
-    void loadQueue(tab);
+    void refreshQueueAndCatalog(tab);
   };
 
-  const activeIndex = items.findIndex((i) => i.id === selectedId);
-  const activeItem = activeIndex >= 0 ? items[activeIndex] : items[0] ?? null;
+  const trimmedQuery = filterQuery.trim().toLowerCase();
+  const visibleItems = trimmedQuery
+    ? items.filter(
+        (item) =>
+          item.subjectCode.toLowerCase().includes(trimmedQuery) ||
+          item.subjectName.toLowerCase().includes(trimmedQuery) ||
+          item.trackingCode.toLowerCase().includes(trimmedQuery) ||
+          item.branchCode.toLowerCase().includes(trimmedQuery)
+      )
+    : items;
+
+  const activeIndex = visibleItems.findIndex((i) => i.id === selectedId);
+  const activeItem =
+    activeIndex >= 0 ? visibleItems[activeIndex] : visibleItems[0] ?? null;
 
   return (
     <div className="space-y-4">
@@ -583,8 +700,8 @@ export function ModerationWorkbenchClient({
             Moderation workbench
           </h1>
           <p className="body-6 text-[var(--text-secondary)]">
-            Verify uploaded PDFs and adjust Year, Sem, or Supply tags before
-            publishing
+            Verify uploaded PDFs, or switch to Published to edit subject names
+            and tags anytime
           </p>
         </div>
 
@@ -632,7 +749,7 @@ export function ModerationWorkbenchClient({
       )}
 
       {loading ? (
-        <div className="h-96 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]" />
+        <PaperCardListSkeleton count={3} />
       ) : items.length === 0 ? (
         <div
           className="rounded-xl p-8 text-center space-y-2"
@@ -650,80 +767,107 @@ export function ModerationWorkbenchClient({
         </div>
       ) : (
         <div className="space-y-4">
-          <div
-            className="rounded-xl p-2.5 flex items-center gap-2"
-            style={{
-              backgroundColor: "var(--surface-primary)",
-              border: "1px solid var(--border-primary)",
-            }}
-          >
-            <button
-              type="button"
-              disabled={activeIndex <= 0}
-              onClick={() =>
-                activeIndex > 0 && setSelectedId(items[activeIndex - 1].id)
-              }
-              aria-label="Previous submission"
-              className="w-9 h-9 shrink-0 rounded-lg inline-flex items-center justify-center bg-[var(--surface-raised)] disabled:opacity-40 cursor-pointer"
-            >
-              <CaretLeft size={16} weight="regular" />
-            </button>
-
-            <div className="flex-1 flex items-center gap-2 overflow-x-auto py-0.5">
-              {items.map((item) => {
-                const active = item.id === activeItem?.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setSelectedId(item.id)}
-                    className={`shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 text-left cursor-pointer transition-colors duration-200 ${
-                      active
-                        ? "bg-[var(--surface-raised)]"
-                        : "hover:bg-[var(--surface-raised)]"
-                    }`}
-                    style={{
-                      border: active
-                        ? "1px solid #2563EB"
-                        : "1px solid var(--border-primary)",
-                    }}
-                  >
-                    <span className="font-mono caption-4 text-[var(--text-primary)]">
-                      {item.subjectCode}
-                    </span>
-                    <span className="body-6 text-[var(--text-secondary)] max-w-[160px] truncate">
-                      {item.subjectName}
-                    </span>
-                    <ExamTypeBadge examType={item.examType} />
-                    <span className="font-mono caption-5 text-[var(--text-muted)]">
-                      {item.trackingCode}
-                    </span>
-                  </button>
-                );
-              })}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2.5">
+            <div className="relative sm:w-80 shrink-0">
+              <MagnifyingGlass
+                size={15}
+                weight="regular"
+                className="absolute left-3 top-3 text-[var(--text-muted)] pointer-events-none"
+              />
+              <input
+                type="search"
+                value={filterQuery}
+                onChange={(e) => setFilterQuery(e.target.value)}
+                placeholder="Filter by code, subject, or PV code"
+                aria-label="Filter moderation papers"
+                className="w-full h-10 pl-9 pr-3 rounded-xl text-base sm:text-sm bg-[var(--surface-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+                style={{ border: "1px solid var(--border-primary)" }}
+              />
             </div>
 
-            <button
-              type="button"
-              disabled={activeIndex < 0 || activeIndex >= items.length - 1}
-              onClick={() =>
-                activeIndex < items.length - 1 &&
-                setSelectedId(items[activeIndex + 1].id)
-              }
-              aria-label="Next submission"
-              className="w-9 h-9 shrink-0 rounded-lg inline-flex items-center justify-center bg-[var(--surface-raised)] disabled:opacity-40 cursor-pointer"
+            <div
+              className="flex-1 min-w-0 rounded-xl p-2 flex items-center gap-2"
+              style={{
+                backgroundColor: "var(--surface-primary)",
+                border: "1px solid var(--border-primary)",
+              }}
             >
-              <CaretRight size={16} weight="regular" />
-            </button>
+              <button
+                type="button"
+                disabled={activeIndex <= 0}
+                onClick={() =>
+                  activeIndex > 0 && setSelectedId(visibleItems[activeIndex - 1].id)
+                }
+                aria-label="Previous submission"
+                className="w-9 h-9 shrink-0 rounded-lg inline-flex items-center justify-center bg-[var(--surface-raised)] disabled:opacity-40 cursor-pointer"
+              >
+                <CaretLeft size={16} weight="regular" />
+              </button>
+
+              <div className="flex-1 flex items-center gap-2 overflow-x-auto py-0.5">
+                {visibleItems.length === 0 ? (
+                  <span className="px-2 caption-5 text-[var(--text-muted)]">
+                    No matching papers for &ldquo;{filterQuery.trim()}&rdquo;
+                  </span>
+                ) : (
+                  visibleItems.map((item) => {
+                    const active = item.id === activeItem?.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => setSelectedId(item.id)}
+                        className={`shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 text-left cursor-pointer transition-colors duration-200 ${
+                          active
+                            ? "bg-[var(--surface-raised)]"
+                            : "hover:bg-[var(--surface-raised)]"
+                        }`}
+                        style={{
+                          border: active
+                            ? "1px solid #2563EB"
+                            : "1px solid var(--border-primary)",
+                        }}
+                      >
+                        <span className="font-mono caption-4 text-[var(--text-primary)]">
+                          {item.subjectCode}
+                        </span>
+                        <span className="body-6 text-[var(--text-secondary)] max-w-[160px] truncate">
+                          {item.subjectName}
+                        </span>
+                        <ExamTypeBadge examType={item.examType} />
+                        <span className="font-mono caption-5 text-[var(--text-muted)]">
+                          {item.trackingCode}
+                        </span>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+
+              <button
+                type="button"
+                disabled={
+                  activeIndex < 0 || activeIndex >= visibleItems.length - 1
+                }
+                onClick={() =>
+                  activeIndex < visibleItems.length - 1 &&
+                  setSelectedId(visibleItems[activeIndex + 1].id)
+                }
+                aria-label="Next submission"
+                className="w-9 h-9 shrink-0 rounded-lg inline-flex items-center justify-center bg-[var(--surface-raised)] disabled:opacity-40 cursor-pointer"
+              >
+                <CaretRight size={16} weight="regular" />
+              </button>
+            </div>
           </div>
 
           {activeItem && (
             <QueueInspector
-              key={activeItem.id}
+              key={`${activeItem.id}:${activeItem.subjectCode}:${activeItem.subjectName}`}
               activeItem={activeItem}
-              catalog={catalog}
+              catalog={liveCatalog}
               statusTab={statusTab}
-              onDone={() => loadQueue(statusTab)}
+              onDone={() => refreshQueueAndCatalog(statusTab)}
               onFeedback={setFeedback}
             />
           )}

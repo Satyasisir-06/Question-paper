@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, UploadSimple } from "@phosphor-icons/react";
+import { Check, MagnifyingGlass, Plus, UploadSimple } from "@phosphor-icons/react";
 import type { FilterCatalogDto } from "@/types/paper";
 import { getSemestersForYear, type ExamTypeValue } from "@/lib/btech";
 import { safeReadApiJson } from "@/lib/httpClient";
@@ -151,7 +151,66 @@ export function CatalogManagerClient({
     setStatusMsg(`Published ${parsed.data.trackingCode} directly to archive`);
   };
 
+  // Subject inline rename
+  const [subjectQuery, setSubjectQuery] = useState("");
+  const [subjectDrafts, setSubjectDrafts] = useState<
+    Record<string, { code: string; name: string }>
+  >({});
+  const [savingSubjectId, setSavingSubjectId] = useState<string | null>(null);
+
+  const handleSaveSubject = async (subject: FilterCatalogDto["subjects"][number]) => {
+    const draft = subjectDrafts[subject.id] ?? {
+      code: subject.code,
+      name: subject.name,
+    };
+    const cleanCode = draft.code.trim().toUpperCase();
+    const cleanName = draft.name.trim();
+    if (cleanCode.length < 2 || cleanName.length < 2) {
+      setErrorMsg("Enter both a valid subject code and subject name.");
+      return;
+    }
+
+    setSavingSubjectId(subject.id);
+    setStatusMsg("");
+    setErrorMsg("");
+    try {
+      const res = await fetch("/api/v1/admin/catalog", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: subject.id,
+          code: cleanCode,
+          name: cleanName,
+        }),
+      });
+      const parsed = await safeReadApiJson<{ code: string; name: string }>(
+        res,
+        "Unable to update subject."
+      );
+      if (!parsed.ok || !parsed.data) {
+        setErrorMsg(parsed.errorMessage);
+        return;
+      }
+      setStatusMsg(
+        `Updated subject ${parsed.data.code} — ${parsed.data.name} across all linked papers`
+      );
+      await refreshCatalog();
+    } finally {
+      setSavingSubjectId(null);
+    }
+  };
+
   const validSems = getSemestersForYear(pubYear);
+  const branchNameById = new Map(catalog.branches.map((b) => [b.id, b.code]));
+  const regNameById = new Map(catalog.regulations.map((r) => [r.id, r.code]));
+  const trimmedSubjectQuery = subjectQuery.trim().toLowerCase();
+  const filteredSubjects = trimmedSubjectQuery
+    ? catalog.subjects.filter(
+        (s) =>
+          s.code.toLowerCase().includes(trimmedSubjectQuery) ||
+          s.name.toLowerCase().includes(trimmedSubjectQuery)
+      )
+    : catalog.subjects;
 
   return (
     <div className="space-y-6">
@@ -394,6 +453,114 @@ export function CatalogManagerClient({
       </div>
 
       <section
+        aria-label="Edit catalog subject names"
+        className="rounded-xl p-5 space-y-4"
+        style={{
+          backgroundColor: "var(--surface-primary)",
+          border: "1px solid var(--border-primary)",
+        }}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="heading-6 text-[var(--text-primary)]">
+              Subjects directory (edit names after publish)
+            </h2>
+            <p className="caption-5 text-[var(--text-muted)]">
+              Renaming a subject updates every published paper linked to it across the archive.
+            </p>
+          </div>
+          <div className="relative sm:w-72">
+            <MagnifyingGlass
+              size={15}
+              weight="regular"
+              className="absolute left-3 top-2.5 text-[var(--text-muted)] pointer-events-none"
+            />
+            <input
+              type="search"
+              value={subjectQuery}
+              onChange={(e) => setSubjectQuery(e.target.value)}
+              placeholder="Search code or subject name"
+              aria-label="Search catalog subjects"
+              className="w-full h-9 pl-8 pr-3 rounded-lg body-6 bg-[var(--surface-raised)]"
+              style={{ border: "1px solid var(--border-primary)" }}
+            />
+          </div>
+        </div>
+
+        <div className="max-h-96 overflow-y-auto divide-y divide-[var(--border-primary)]">
+          {filteredSubjects.map((subject) => {
+            const draft = subjectDrafts[subject.id] ?? {
+              code: subject.code,
+              name: subject.name,
+            };
+            const dirty =
+              draft.code.trim().toUpperCase() !== subject.code ||
+              draft.name.trim() !== subject.name;
+            const busy = savingSubjectId === subject.id;
+            const branchCode = branchNameById.get(subject.branchId) ?? "";
+            const regCode = regNameById.get(subject.regulationId) ?? "";
+
+            return (
+              <div
+                key={subject.id}
+                className="py-2.5 flex flex-col md:flex-row md:items-center gap-2.5"
+              >
+                <div className="flex items-center gap-2 shrink-0">
+                  <input
+                    type="text"
+                    value={draft.code}
+                    aria-label={`Subject code for ${subject.code}`}
+                    onChange={(e) =>
+                      setSubjectDrafts((prev) => ({
+                        ...prev,
+                        [subject.id]: {
+                          ...draft,
+                          code: e.target.value.toUpperCase(),
+                        },
+                      }))
+                    }
+                    className="w-24 h-9 px-2.5 rounded-lg font-mono caption-4 bg-[var(--surface-raised)]"
+                    style={{ border: "1px solid var(--border-primary)" }}
+                  />
+                  <span className="font-mono caption-5 text-[var(--text-muted)] w-28 shrink-0">
+                    {subject.yearOfStudy}-{subject.semester % 2 === 1 ? 1 : 2} ·{" "}
+                    {branchCode} {regCode}
+                  </span>
+                </div>
+
+                <input
+                  type="text"
+                  value={draft.name}
+                  aria-label={`Subject name for ${subject.code}`}
+                  onChange={(e) =>
+                    setSubjectDrafts((prev) => ({
+                      ...prev,
+                      [subject.id]: {
+                        ...draft,
+                        name: e.target.value,
+                      },
+                    }))
+                  }
+                  className="flex-1 h-9 px-2.5 rounded-lg body-6 bg-[var(--surface-raised)]"
+                  style={{ border: "1px solid var(--border-primary)" }}
+                />
+
+                <button
+                  type="button"
+                  disabled={!dirty || busy}
+                  onClick={() => void handleSaveSubject(subject)}
+                  className="inline-flex items-center justify-center gap-1.5 h-9 px-3 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-45 shrink-0 cursor-pointer"
+                >
+                  <Check size={14} weight="bold" />
+                  <span>{busy ? "Saving..." : "Save"}</span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section
         aria-label="Recent audit logs"
         className="rounded-xl p-5 space-y-3"
         style={{
@@ -429,7 +596,7 @@ export function CatalogManagerClient({
                     <td className="py-2 pr-4 text-[var(--text-muted)]">
                       {log.ipAddress ?? "-"}
                     </td>
-                    <td className="py-2 text-[var(--text-muted)]">
+                    <td className="py-2 text-[var(--text-muted)]" suppressHydrationWarning>
                       {new Date(log.createdAt).toLocaleString()}
                     </td>
                   </tr>

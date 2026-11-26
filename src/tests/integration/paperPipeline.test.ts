@@ -9,11 +9,12 @@ import {
   ensureAdminUser,
   generateSampleQuestionPaperPdf,
 } from "@/server/db/seedData";
-import { branches, papers, regulations, subjects, users } from "@/server/db/schema";
+import { auditLogs, branches, papers, regulations, subjects, users } from "@/server/db/schema";
 import { LocalStorageProvider } from "@/server/storage/localStorageProvider";
 import { PaperService } from "@/server/services/paperService";
 import { UploadService, UploadValidationError } from "@/server/services/uploadService";
 import { ModerationService } from "@/server/services/moderationService";
+import { CatalogService } from "@/server/services/catalogService";
 
 let db: AppDb;
 let closeDbFn: () => Promise<void>;
@@ -292,5 +293,64 @@ describe("Question paper moderation & filtering pipeline (Integration)", () => {
     const queue = await moderationService.listAdminPapers("PENDING");
     const flagged = queue.find((item) => item.id === dupUpload.paperId);
     expect(flagged?.duplicateMatches[0]?.id).toBe(existing.id);
+  });
+
+  it("allows admin to edit subject name and reassign subject code after publish", async () => {
+    const [approved] = await db
+      .select()
+      .from(papers)
+      .where(eq(papers.status, "APPROVED"));
+    const [admin] = await db.select().from(users);
+
+    // 1) Edit subject name on an already-published paper in place
+    await moderationService.approvePaper({
+      paperId: approved.id,
+      adminUserId: admin.id,
+      ipAddress: "127.0.0.1",
+      updates: {
+        subjectName: "Renamed Subject After Publish",
+      },
+    });
+
+    const renamedView = await paperService.getApprovedPaper(approved.id);
+    expect(renamedView?.status).toBe("APPROVED");
+    expect(renamedView?.subjectName).toBe("Renamed Subject After Publish");
+
+    const logs = await db
+      .select()
+      .from(auditLogs)
+      .where(eq(auditLogs.entityId, approved.id));
+    expect(logs.some((l) => l.action === "UPDATE_PUBLISHED")).toBe(true);
+
+    // 2) Reassign to a distinct subject code + name without affecting other papers
+    await moderationService.approvePaper({
+      paperId: approved.id,
+      adminUserId: admin.id,
+      ipAddress: "127.0.0.1",
+      updates: {
+        subjectCode: "CS488",
+        subjectName: "Distributed Systems Special",
+      },
+    });
+
+    const reassignedView = await paperService.getApprovedPaper(approved.id);
+    expect(reassignedView?.subjectCode).toBe("CS488");
+    expect(reassignedView?.subjectName).toBe("Distributed Systems Special");
+
+    // 3) Rename directly via CatalogService as well
+    const catalogService = new CatalogService(db);
+    await catalogService.updateSubject({
+      id: reassignedView!.subjectId,
+      name: "Distributed Cloud Systems",
+    });
+
+    const catalogAfter = await catalogService.getCatalog();
+    const updatedSubject = catalogAfter.subjects.find(
+      (s) => s.id === reassignedView!.subjectId
+    );
+    expect(updatedSubject?.name).toBe("Distributed Cloud Systems");
+
+    const publicAfterCatalogEdit = await paperService.getApprovedPaper(approved.id);
+    expect(publicAfterCatalogEdit?.subjectName).toBe("Distributed Cloud Systems");
   });
 });

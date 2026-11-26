@@ -112,6 +112,19 @@ export class CatalogRepository {
     return row;
   }
 
+  async updateSubject(input: { id: string; code?: string; name: string }) {
+    const patch = {
+      name: input.name.trim(),
+      ...(input.code ? { code: input.code.trim().toUpperCase() } : {}),
+    };
+    const [row] = await this.db
+      .update(subjects)
+      .set(patch)
+      .where(eq(subjects.id, input.id))
+      .returning();
+    return row ?? null;
+  }
+
   async findOrCreateSubject(input: {
     code: string;
     name: string;

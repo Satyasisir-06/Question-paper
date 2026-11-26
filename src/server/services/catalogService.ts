@@ -33,6 +33,10 @@ export class CatalogService {
     return this.repo.createSubject(input);
   }
 
+  updateSubject(input: { id: string; code?: string; name: string }) {
+    return this.repo.updateSubject(input);
+  }
+
   /** Import B.Tech subjects from CSV lines: code,name,branchCode,regulationCode,yearOfStudy,semester */
   async importSubjectsFromCsv(csvText: string): Promise<{
     inserted: number;

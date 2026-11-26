@@ -9,8 +9,10 @@ import {
 } from "@/lib/apiResponse";
 import { nodeStreamToWebStream } from "@/lib/streamAdapter";
 import {
+  approvePaperSchema,
   paperQuerySchema,
   rejectPaperSchema,
+  updateSubjectSchema,
   uploadMetadataSchema,
   zipDownloadSchema,
 } from "@/server/validators/schemas";
@@ -81,6 +83,33 @@ describe("API helpers, schemas, and stream adapter", () => {
       examYear: 2024,
     });
     expect(invalidSem.success).toBe(false);
+
+    const parsedApprove = approvePaperSchema.safeParse({
+      subjectCode: " cs499 ",
+      subjectName: " Distributed Systems ",
+    });
+    expect(parsedApprove.success).toBe(true);
+    if (parsedApprove.success) {
+      expect(parsedApprove.data.subjectCode).toBe("CS499");
+      expect(parsedApprove.data.subjectName).toBe("Distributed Systems");
+    }
+    expect(approvePaperSchema.safeParse({ subjectName: "A" }).success).toBe(false);
+
+    const parsedSubjectEdit = updateSubjectSchema.safeParse({
+      id: "33333333-3333-4333-8333-333333333333",
+      code: "cs401",
+      name: "Database Management Systems II",
+    });
+    expect(parsedSubjectEdit.success).toBe(true);
+    if (parsedSubjectEdit.success) {
+      expect(parsedSubjectEdit.data.code).toBe("CS401");
+    }
+    expect(
+      updateSubjectSchema.safeParse({
+        id: "33333333-3333-4333-8333-333333333333",
+        name: "X",
+      }).success
+    ).toBe(false);
   });
 
   it("checks same-origin including forwarded host headers", () => {

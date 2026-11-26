@@ -13,9 +13,15 @@ import {
   ModerationWorkbenchClient,
   type AdminQueueItemDto,
 } from "@/components/admin/ModerationWorkbenchClient";
+import { paperStatusSchema } from "@/server/validators/schemas";
+import type { PaperStatusValue } from "@/lib/btech";
 import { sanitizeConnectionError } from "@/lib/env";
 
-async function AdminQueueBody() {
+async function AdminQueueBody({
+  initialStatus,
+}: {
+  initialStatus: PaperStatusValue;
+}) {
   await connection();
   const user = await getSessionUser();
   if (!user) {
@@ -28,12 +34,12 @@ async function AdminQueueBody() {
   try {
     const db = await getDb();
     const storage = getStorageProvider();
-    const [filters, pendingList] = await Promise.all([
+    const [filters, statusList] = await Promise.all([
       new PaperService(db, storage).getFilters(),
-      new ModerationService(db, storage).listAdminPapers("PENDING"),
+      new ModerationService(db, storage).listAdminPapers(initialStatus),
     ]);
     catalog = filters;
-    initialItems = pendingList.map((item) => ({
+    initialItems = statusList.map((item) => ({
       id: item.id,
       trackingCode: item.trackingCode,
       subjectId: item.subjectId,
@@ -72,6 +78,7 @@ async function AdminQueueBody() {
           <ModerationWorkbenchClient
             catalog={catalog}
             initialItems={initialItems}
+            initialStatus={initialStatus}
           />
         )}
       </main>
@@ -79,11 +86,22 @@ async function AdminQueueBody() {
   );
 }
 
-export default function AdminQueuePage() {
+export default async function AdminQueuePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+  const rawStatus = typeof sp.status === "string" ? sp.status.toUpperCase() : "PENDING";
+  const parsedStatus = paperStatusSchema.safeParse(rawStatus);
+  const initialStatus: PaperStatusValue = parsedStatus.success
+    ? parsedStatus.data
+    : "PENDING";
+
   return (
     <div className="min-h-screen flex flex-col">
       <Suspense fallback={<AdminSectionSkeleton variant="queue" />}>
-        <AdminQueueBody />
+        <AdminQueueBody initialStatus={initialStatus} />
       </Suspense>
     </div>
   );
