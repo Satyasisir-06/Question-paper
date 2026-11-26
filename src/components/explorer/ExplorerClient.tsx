@@ -662,9 +662,6 @@ export function ExplorerClient({
             <Link href="/track" className="hover:text-[var(--text-primary)]">
               Track upload
             </Link>
-            <Link href="/admin" className="hover:text-[var(--text-primary)]">
-              Admin
-            </Link>
             <Link href="/upload" className="text-[#2563EB] hover:underline">
               Upload paper
             </Link>

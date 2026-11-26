@@ -16,6 +16,7 @@ import {
 } from "@/server/validators/schemas";
 import { verifySameOrigin } from "@/server/auth/guards";
 import { safeReadApiJson } from "@/lib/httpClient";
+import { proxy } from "@/proxy";
 
 describe("API helpers, schemas, and stream adapter", () => {
   it("builds consistent success and error envelopes", async () => {
@@ -136,5 +137,32 @@ describe("API helpers, schemas, and stream adapter", () => {
     const parsedHtml = await safeReadApiJson(htmlErrRes, "Sign-in failed");
     expect(parsedHtml.ok).toBe(false);
     expect(parsedHtml.errorMessage).toContain("HTTP 500");
+  });
+
+  it("hides /admin behind optional ADMIN_PORTAL_KEY when configured", () => {
+    const prevKey = process.env.ADMIN_PORTAL_KEY;
+    process.env.ADMIN_PORTAL_KEY = "exam-cell-secret-key";
+    try {
+      const blocked = proxy(
+        new NextRequest("https://example.vercel.app/admin/login")
+      );
+      expect(blocked.headers.get("x-middleware-rewrite")).toContain("/404");
+
+      const unlock = proxy(
+        new NextRequest(
+          "https://example.vercel.app/admin/login?key=exam-cell-secret-key"
+        )
+      );
+      expect(unlock.status).toBe(307);
+      expect(unlock.headers.get("location")).toBe(
+        "https://example.vercel.app/admin/login"
+      );
+      const setCookie = unlock.headers.get("set-cookie") ?? "";
+      expect(setCookie).toContain("pv_admin_gate=");
+      expect(setCookie).toContain("HttpOnly");
+    } finally {
+      if (prevKey === undefined) delete process.env.ADMIN_PORTAL_KEY;
+      else process.env.ADMIN_PORTAL_KEY = prevKey;
+    }
   });
 });

@@ -45,6 +45,7 @@ test.describe("B.Tech PaperVault E2E journeys", () => {
     await expect(
       page.getByRole("heading", { name: "B.Tech question paper archive" })
     ).toBeVisible();
+    await expect(page.locator('a[href^="/admin"]')).toHaveCount(0);
 
     // Filter 2-2 + Supply
     await page.getByRole("button", { name: "2-2", exact: true }).click();

@@ -22,28 +22,16 @@ function HeaderNavItems() {
   const pathname = usePathname();
 
   return (
-    <>
-      <Link
-        href="/track"
-        className={`hidden sm:inline-flex items-center h-9 px-2.5 rounded-lg title-4 transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          pathname === "/track"
-            ? "text-[var(--text-primary)] bg-[var(--surface-raised)]"
-            : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-        }`}
-      >
-        Track upload
-      </Link>
-      <Link
-        href="/admin"
-        className={`hidden sm:inline-flex items-center h-9 px-2.5 rounded-lg title-4 transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          pathname.startsWith("/admin")
-            ? "text-[var(--text-primary)] bg-[var(--surface-raised)]"
-            : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-        }`}
-      >
-        Admin
-      </Link>
-    </>
+    <Link
+      href="/track"
+      className={`hidden sm:inline-flex items-center h-9 px-2.5 rounded-lg title-4 transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        pathname === "/track"
+          ? "text-[var(--text-primary)] bg-[var(--surface-raised)]"
+          : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+      }`}
+    >
+      Track upload
+    </Link>
   );
 }
 
@@ -87,7 +75,6 @@ function MobileMenuDrawer({ onClose }: { onClose: () => void }) {
     { href: "/", label: "Browse question papers" },
     { href: "/upload", label: "Upload question paper" },
     { href: "/track", label: "Track upload status" },
-    { href: "/admin", label: "Admin portal" },
   ];
 
   return (
@@ -167,20 +154,12 @@ export function SiteHeader({
           <nav aria-label="Primary navigation" className="flex items-center gap-1.5 sm:gap-3">
             <Suspense
               fallback={
-                <>
-                  <Link
-                    href="/track"
-                    className="hidden sm:inline-flex items-center h-9 px-2.5 rounded-lg title-4 text-[var(--text-secondary)]"
-                  >
-                    Track upload
-                  </Link>
-                  <Link
-                    href="/admin"
-                    className="hidden sm:inline-flex items-center h-9 px-2.5 rounded-lg title-4 text-[var(--text-secondary)]"
-                  >
-                    Admin
-                  </Link>
-                </>
+                <Link
+                  href="/track"
+                  className="hidden sm:inline-flex items-center h-9 px-2.5 rounded-lg title-4 text-[var(--text-secondary)]"
+                >
+                  Track upload
+                </Link>
               }
             >
               <HeaderNavItems />
