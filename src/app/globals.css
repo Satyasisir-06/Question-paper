@@ -157,6 +157,48 @@ body {
   display: none;
 }
 
+.skeleton-bone {
+  position: relative;
+  overflow: hidden;
+  background-color: #e9eaee;
+}
+
+.skeleton-bone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translate3d(-100%, 0, 0);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.72) 50%,
+    transparent 100%
+  );
+  animation: skeleton-sweep 1.45s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+html.dark .skeleton-bone {
+  background-color: #27272c;
+}
+
+html.dark .skeleton-bone::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+}
+
+@keyframes skeleton-sweep {
+  0% {
+    transform: translate3d(-100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -165,5 +207,9 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .skeleton-bone::after {
+    display: none;
   }
 }

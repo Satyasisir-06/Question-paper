@@ -14,6 +14,7 @@ import type {
   PDFDocumentProxy,
   RenderTask,
 } from "pdfjs-dist";
+import { PdfDocumentSkeleton } from "@/components/ui/Skeletons";
 
 interface PdfViewerProps {
   src: string;
@@ -304,11 +305,7 @@ export function PdfViewer({ src, title }: PdfViewerProps) {
         onScroll={handleScroll}
         className="flex-1 overflow-auto p-2 sm:p-4 bg-[#E5E7EB] dark:bg-[#101113]"
       >
-        {loading && (
-          <div className="max-w-xl mx-auto space-y-4 py-4">
-            <div className="aspect-[1/1.41] w-full rounded-md bg-white/80 dark:bg-white/10" />
-          </div>
-        )}
+        {loading && <PdfDocumentSkeleton />}
 
         {errorMsg && (
           <div className="max-w-md mx-auto my-8 rounded-xl p-5 text-center space-y-3 bg-[var(--surface-primary)] border border-[var(--border-primary)]">

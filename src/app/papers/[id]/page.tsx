@@ -10,6 +10,7 @@ import { PaperService } from "@/server/services/paperService";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ExamTypeBadge } from "@/components/ui/ExamBadge";
 import { ServerErrorBanner } from "@/components/ui/ServerErrorBanner";
+import { PaperDetailSkeleton } from "@/components/ui/Skeletons";
 import { PdfViewer } from "@/components/pdf/PdfViewer";
 import { sanitizeConnectionError } from "@/lib/env";
 import {
@@ -144,13 +145,7 @@ export default function PaperDetailPage({
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <Suspense
-        fallback={
-          <div className="max-w-6xl w-full mx-auto px-4 py-8">
-            <div className="h-[70vh] rounded-2xl bg-[var(--surface-primary)] border border-[var(--border-primary)]" />
-          </div>
-        }
-      >
+      <Suspense fallback={<PaperDetailSkeleton />}>
         <PaperDetailContent paramsPromise={params} />
       </Suspense>
     </div>

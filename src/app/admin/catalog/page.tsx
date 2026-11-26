@@ -9,6 +9,7 @@ import { ModerationService } from "@/server/services/moderationService";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { CatalogManagerClient } from "@/components/admin/CatalogManagerClient";
 import { ServerErrorBanner } from "@/components/ui/ServerErrorBanner";
+import { AdminSectionSkeleton } from "@/components/ui/Skeletons";
 import { sanitizeConnectionError } from "@/lib/env";
 
 async function AdminCatalogBody() {
@@ -69,13 +70,7 @@ async function AdminCatalogBody() {
 export default function AdminCatalogPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Suspense
-        fallback={
-          <div className="max-w-7xl w-full mx-auto px-6 py-8">
-            <div className="h-96 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]" />
-          </div>
-        }
-      >
+      <Suspense fallback={<AdminSectionSkeleton variant="catalog" />}>
         <AdminCatalogBody />
       </Suspense>
     </div>

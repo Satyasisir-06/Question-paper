@@ -8,6 +8,7 @@ import { ModerationService } from "@/server/services/moderationService";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { AdminOverviewClient } from "@/components/admin/AdminOverviewClient";
 import { ServerErrorBanner } from "@/components/ui/ServerErrorBanner";
+import { AdminSectionSkeleton } from "@/components/ui/Skeletons";
 import { sanitizeConnectionError } from "@/lib/env";
 
 async function AdminOverviewBody() {
@@ -45,13 +46,7 @@ async function AdminOverviewBody() {
 export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Suspense
-        fallback={
-          <div className="max-w-7xl w-full mx-auto px-6 py-8">
-            <div className="h-64 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]" />
-          </div>
-        }
-      >
+      <Suspense fallback={<AdminSectionSkeleton variant="overview" />}>
         <AdminOverviewBody />
       </Suspense>
     </div>

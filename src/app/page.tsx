@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { getDb } from "@/server/db/client";
 import { PaperService } from "@/server/services/paperService";
 import { ExplorerClient } from "@/components/explorer/ExplorerClient";
+import { HomePageSkeleton } from "@/components/ui/Skeletons";
 import { sanitizeConnectionError } from "@/lib/env";
 import type { FilterCatalogDto, PaperDto } from "@/types/paper";
 
@@ -50,33 +51,9 @@ async function ExplorerLoader() {
   );
 }
 
-function ExplorerShellFallback() {
-  return (
-    <div className="min-h-[100dvh] max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-6 space-y-6">
-      <div className="h-14 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]" />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-        <div className="lg:col-span-7 h-52 rounded-2xl bg-[var(--surface-primary)] border border-[var(--border-primary)]" />
-        <div className="hidden lg:block lg:col-span-5 h-52 rounded-2xl bg-[var(--surface-primary)] border border-[var(--border-primary)]" />
-      </div>
-      <div className="h-20 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]" />
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="hidden lg:block h-96 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]" />
-        <div className="lg:col-span-3 space-y-3">
-          {[1, 2, 3, 4].map((idx) => (
-            <div
-              key={idx}
-              className="h-24 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]"
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function HomePage() {
   return (
-    <Suspense fallback={<ExplorerShellFallback />}>
+    <Suspense fallback={<HomePageSkeleton />}>
       <ExplorerLoader />
     </Suspense>
   );

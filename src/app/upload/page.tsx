@@ -5,6 +5,7 @@ import { getDb } from "@/server/db/client";
 import { PaperService } from "@/server/services/paperService";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ServerErrorBanner } from "@/components/ui/ServerErrorBanner";
+import { UploadPageSkeleton } from "@/components/ui/Skeletons";
 import { UploadFormClient } from "@/components/upload/UploadFormClient";
 import { sanitizeConnectionError } from "@/lib/env";
 import type { ExamTypeValue } from "@/lib/btech";
@@ -84,11 +85,7 @@ export default function UploadPage({
           </p>
         </div>
 
-        <Suspense
-          fallback={
-            <div className="max-w-2xl mx-auto h-96 rounded-2xl bg-[var(--surface-primary)] border border-[var(--border-primary)]" />
-          }
-        >
+        <Suspense fallback={<UploadPageSkeleton />}>
           <UploadPageBody searchParamsPromise={searchParams} />
         </Suspense>
       </main>

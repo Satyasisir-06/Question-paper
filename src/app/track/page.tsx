@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { getDb } from "@/server/db/client";
 import { UploadService } from "@/server/services/uploadService";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { TrackPageSkeleton } from "@/components/ui/Skeletons";
 import {
   TrackClient,
   type TrackedSubmission,
@@ -78,11 +79,7 @@ export default function TrackPage({
             approval status.
           </p>
         </div>
-        <Suspense
-          fallback={
-            <div className="max-w-xl mx-auto h-24 rounded-2xl bg-[var(--surface-primary)] border border-[var(--border-primary)]" />
-          }
-        >
+        <Suspense fallback={<TrackPageSkeleton />}>
           <TrackBody searchParamsPromise={searchParams} />
         </Suspense>
       </main>

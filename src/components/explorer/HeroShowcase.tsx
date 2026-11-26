@@ -9,7 +9,7 @@ const DitherVeil = dynamic(() => import("@/components/ui/DitherVeil"), {
   ssr: false,
   loading: () => (
     <div
-      className="w-full h-full bg-[var(--surface-raised)]"
+      className="w-full h-full skeleton-bone"
       aria-hidden="true"
     />
   ),

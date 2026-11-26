@@ -8,6 +8,7 @@ import { PaperService } from "@/server/services/paperService";
 import { ModerationService } from "@/server/services/moderationService";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { ServerErrorBanner } from "@/components/ui/ServerErrorBanner";
+import { AdminSectionSkeleton } from "@/components/ui/Skeletons";
 import {
   ModerationWorkbenchClient,
   type AdminQueueItemDto,
@@ -81,13 +82,7 @@ async function AdminQueueBody() {
 export default function AdminQueuePage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Suspense
-        fallback={
-          <div className="max-w-7xl w-full mx-auto px-6 py-8">
-            <div className="h-96 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]" />
-          </div>
-        }
-      >
+      <Suspense fallback={<AdminSectionSkeleton variant="queue" />}>
         <AdminQueueBody />
       </Suspense>
     </div>

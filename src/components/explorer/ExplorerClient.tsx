@@ -22,21 +22,16 @@ import { HeroShowcase } from "@/components/explorer/HeroShowcase";
 import { YearSemMatrix } from "@/components/explorer/YearSemMatrix";
 import { FilterSidebar } from "@/components/explorer/FilterSidebar";
 import { PaperCard } from "@/components/explorer/PaperCard";
+import {
+  FolderTreeSkeleton,
+  PaperCardListSkeleton,
+} from "@/components/ui/Skeletons";
 import { safeReadApiJson } from "@/lib/httpClient";
 
 const FolderTree = dynamic(
   () => import("@/components/explorer/FolderTree").then((mod) => mod.FolderTree),
   {
-    loading: () => (
-      <div className="space-y-3">
-        {[1, 2, 3].map((idx) => (
-          <div
-            key={idx}
-            className="h-20 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]"
-          />
-        ))}
-      </div>
-    ),
+    loading: () => <FolderTreeSkeleton />,
   }
 );
 
@@ -561,14 +556,7 @@ export function ExplorerClient({
 
             {viewMode === "folders" ? (
               treeLoading || !treeData ? (
-                <div className="space-y-3">
-                  {[1, 2, 3].map((idx) => (
-                    <div
-                      key={idx}
-                      className="h-20 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]"
-                    />
-                  ))}
-                </div>
+                <FolderTreeSkeleton />
               ) : (
                 <FolderTree
                   tree={treeData}
@@ -581,18 +569,7 @@ export function ExplorerClient({
                 />
               )
             ) : loading ? (
-              <div className="space-y-3" aria-busy="true" aria-label="Loading papers">
-                {[1, 2, 3, 4].map((idx) => (
-                  <div
-                    key={idx}
-                    className="rounded-xl p-4 h-24 bg-[var(--surface-primary)]"
-                    style={{ border: "1px solid var(--border-primary)" }}
-                  >
-                    <div className="h-4 w-36 rounded bg-[var(--surface-raised)] mb-3" />
-                    <div className="h-5 w-72 rounded bg-[var(--surface-raised)]" />
-                  </div>
-                ))}
-              </div>
+              <PaperCardListSkeleton count={4} />
             ) : errorMsg ? (
               <div
                 role="alert"
