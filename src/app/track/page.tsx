@@ -74,7 +74,7 @@ export default function TrackPage({
             Track submission status
           </h1>
           <p className="body-6 text-[var(--text-secondary)]">
-            Enter your submission code (for example PV-PEND01) to check admin
+            Enter your submission code (for example PV-A1B2C3) to check admin
             approval status.
           </p>
         </div>

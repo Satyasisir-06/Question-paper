@@ -261,6 +261,16 @@ export function ExplorerClient({
   const activeFilterCount =
     (branch ? 1 : 0) + (regulation ? 1 : 0) + (examYear ? 1 : 0);
 
+  const hasAnyFilter = Boolean(
+    searchQuery.trim() ||
+      year !== undefined ||
+      sem !== undefined ||
+      examType ||
+      branch ||
+      regulation ||
+      examYear
+  );
+
   const handleJumpToArchive = useCallback(() => {
     const target = document.getElementById("archive-explorer");
     target?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -602,21 +612,26 @@ export function ExplorerClient({
                 }}
               >
                 <p className="title-3 text-[var(--text-primary)]">
-                  No matching papers found for {breadcrumbParts}
+                  {hasAnyFilter
+                    ? `No matching papers found for ${breadcrumbParts}`
+                    : "No question papers published yet"}
                 </p>
                 <p className="body-6 text-[var(--text-secondary)] max-w-md mx-auto">
-                  Try widening your filters or upload a copy of this question
-                  paper for admin review.
+                  {hasAnyFilter
+                    ? "Try widening your filters or upload a copy of this question paper for admin review."
+                    : "Upload the first verified B.Tech question paper to start the archive."}
                 </p>
                 <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
-                  <button
-                    type="button"
-                    onClick={resetFilters}
-                    className="h-9 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] cursor-pointer"
-                    style={{ border: "1px solid var(--border-primary)" }}
-                  >
-                    Reset filters
-                  </button>
+                  {hasAnyFilter && (
+                    <button
+                      type="button"
+                      onClick={resetFilters}
+                      className="h-9 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] cursor-pointer"
+                      style={{ border: "1px solid var(--border-primary)" }}
+                    >
+                      Reset filters
+                    </button>
+                  )}
                   <Link
                     href={uploadPrefillHref}
                     className="inline-flex items-center gap-2 h-9 px-3 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8]"

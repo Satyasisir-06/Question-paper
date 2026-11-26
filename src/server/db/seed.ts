@@ -1,10 +1,17 @@
 import fs from "node:fs";
 import path from "node:path";
 import { closeDb, getDb } from "./client";
-import { ensureAdminUser, seedDatabase, syncDefaultBranches } from "./seedData";
+import {
+  ensureAdminUser,
+  ensureCoreCatalog,
+  seedDatabase,
+  syncDefaultBranches,
+} from "./seedData";
 import { getStorageProvider } from "@/server/storage";
 
 async function runSeed() {
+  const isLocal = process.argv.includes("--local");
+  const withSamples = isLocal || process.argv.includes("--samples");
   const envPath = path.resolve(".env");
   if (fs.existsSync(envPath) && typeof process.loadEnvFile === "function") {
     const prevDb = process.env.DATABASE_URL;
@@ -15,18 +22,25 @@ async function runSeed() {
     if (prevStorage !== undefined) process.env.STORAGE_PROVIDER = prevStorage;
     if (prevDir !== undefined) process.env.LOCAL_STORAGE_DIR = prevDir;
   }
-  if (process.argv.includes("--local")) {
+  if (isLocal) {
     process.env.DATABASE_URL = "pglite://./data/pgdata";
     process.env.STORAGE_PROVIDER = "local";
     process.env.LOCAL_STORAGE_DIR = "./storage";
   }
 
   const db = await getDb();
-  const storage = getStorageProvider();
-  await seedDatabase(db, storage);
-  await syncDefaultBranches(db);
-  await ensureAdminUser(db);
-  console.log("Seed completed successfully.");
+  if (withSamples) {
+    const storage = getStorageProvider();
+    await seedDatabase(db, storage);
+    await syncDefaultBranches(db);
+    await ensureAdminUser(db);
+    console.log("Seed with local/sample papers completed successfully.");
+  } else {
+    await ensureCoreCatalog(db);
+    await syncDefaultBranches(db);
+    await ensureAdminUser(db);
+    console.log("Catalog & admin sync completed cleanly (no sample mock papers inserted).");
+  }
 }
 
 runSeed()
