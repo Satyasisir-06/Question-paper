@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { DownloadSimple, Eye, FilePdf } from "@phosphor-icons/react";
 import type { PaperDto } from "@/types/paper";
 import {
@@ -16,7 +17,7 @@ interface PaperCardProps {
   onPreview: (paper: PaperDto) => void;
 }
 
-export function PaperCard({
+export const PaperCard = memo(function PaperCard({
   paper,
   selected,
   onToggleSelect,
@@ -27,7 +28,7 @@ export function PaperCard({
 
   return (
     <article
-      className="rounded-xl p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 transition-[border-color,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]"
+      className="paper-card-perf rounded-xl p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 transition-[border-color,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[var(--border-strong)]"
       style={{
         backgroundColor: "var(--surface-primary)",
         border: selected
@@ -36,8 +37,8 @@ export function PaperCard({
         boxShadow: "var(--shadow-card)",
       }}
     >
-      <div className="flex items-start gap-3 min-w-0">
-        <label className="pt-1 flex items-center cursor-pointer min-w-[24px] min-h-[24px]">
+      <div className="flex items-start gap-2.5 sm:gap-3 min-w-0">
+        <label className="pt-0.5 flex items-center cursor-pointer min-w-[20px] min-h-[24px] shrink-0">
           <input
             type="checkbox"
             checked={selected}
@@ -54,8 +55,8 @@ export function PaperCard({
           <FilePdf size={20} weight="regular" />
         </div>
 
-        <div className="min-w-0 space-y-1.5">
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <div className="min-w-0 space-y-1 flex-1">
+          <div className="flex flex-wrap items-center gap-1.5">
             <span className="font-mono caption-4 px-2 py-0.5 rounded bg-[var(--surface-raised)] text-[var(--text-primary)]">
               {paper.subjectCode}
             </span>
@@ -68,11 +69,11 @@ export function PaperCard({
             <ExamTypeBadge examType={paper.examType} />
           </div>
 
-          <h3 className="title-3 text-[var(--text-primary)] leading-snug">
+          <h3 className="text-[15px] sm:text-base font-medium text-[var(--text-primary)] leading-snug">
             {paper.subjectName}
           </h3>
 
-          <p className="caption-5 text-[var(--text-muted)] font-mono tabular-nums">
+          <p className="caption-5 text-[var(--text-muted)] font-mono tabular-nums truncate">
             {session}
             {paper.setLabel ? ` · ${paper.setLabel}` : ""} ·{" "}
             {formatFileSize(paper.fileSizeBytes)} · {paper.pageCount}p ·{" "}
@@ -81,11 +82,11 @@ export function PaperCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:flex items-center gap-2 shrink-0 sm:self-center pt-1 sm:pt-0">
+      <div className="grid grid-cols-2 sm:flex items-center gap-2 shrink-0 sm:self-center">
         <button
           type="button"
           onClick={() => onPreview(paper)}
-          className="inline-flex items-center justify-center gap-1.5 h-11 sm:h-9 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] transition-[opacity,transform] duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+          className="inline-flex items-center justify-center gap-1.5 h-10 sm:h-9 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] transition-[opacity,transform] duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
           style={{ border: "1px solid var(--border-primary)" }}
         >
           <Eye size={16} weight="regular" />
@@ -94,7 +95,7 @@ export function PaperCard({
 
         <a
           href={`/api/v1/papers/${paper.id}/download`}
-          className="inline-flex items-center justify-center gap-1.5 h-11 sm:h-9 px-3 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.98] transition-[background-color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+          className="inline-flex items-center justify-center gap-1.5 h-10 sm:h-9 px-3 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.98] transition-[background-color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
         >
           <DownloadSimple size={16} weight="regular" />
           <span>Download</span>
@@ -102,4 +103,4 @@ export function PaperCard({
       </div>
     </article>
   );
-}
+});

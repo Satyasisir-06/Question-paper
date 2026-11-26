@@ -69,15 +69,18 @@ export function FilterSidebar({
                 key={branch.id}
                 type="button"
                 onClick={() => onBranchChange(active ? "" : branch.code)}
-                className={`w-full h-9 px-2.5 rounded-lg flex items-center justify-between body-6 transition-colors duration-200 cursor-pointer ${
+                title={branch.name}
+                className={`w-full min-h-9 py-1.5 px-2.5 rounded-lg flex items-center gap-2.5 text-left transition-colors duration-200 cursor-pointer ${
                   active
                     ? "bg-[var(--surface-raised)] text-[var(--text-primary)] font-medium"
                     : "text-[var(--text-secondary)] hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)]"
                 }`}
               >
-                <span className="truncate">{branch.name}</span>
-                <span className="font-mono caption-5 text-[var(--text-muted)] ml-2 shrink-0">
+                <span className="w-14 shrink-0 font-mono caption-4 text-[var(--text-primary)]">
                   {branch.code}
+                </span>
+                <span className="text-xs leading-snug line-clamp-2 flex-1">
+                  {branch.name}
                 </span>
               </button>
             );
@@ -161,7 +164,7 @@ export function FilterSidebar({
     <>
       <aside
         aria-label="Filter question papers"
-        className="hidden lg:block w-[260px] shrink-0 rounded-xl p-4 self-start sticky top-20"
+        className="hidden lg:block w-[272px] shrink-0 rounded-xl p-4 self-start sticky top-20"
         style={{
           backgroundColor: "var(--surface-sidebar)",
           border: "1px solid var(--border-primary)",

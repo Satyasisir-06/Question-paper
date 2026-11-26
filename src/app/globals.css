@@ -5,7 +5,7 @@
   --surface-primary: #ffffff;
   --surface-raised: #f4f4f5;
   --surface-sidebar: #ffffff;
-  --border-primary: rgba(23, 23, 23, 0.09);
+  --border-primary: rgba(23, 23, 23, 0.08);
   --border-strong: rgba(23, 23, 23, 0.16);
   --text-primary: #171717;
   --text-secondary: #525252;
@@ -31,11 +31,11 @@
 
 html.dark {
   --surface-canvas: #141415;
-  --surface-primary: #181818;
-  --surface-raised: #272727;
-  --surface-sidebar: #0f0f10;
+  --surface-primary: #18181b;
+  --surface-raised: #232327;
+  --surface-sidebar: #111113;
   --border-primary: rgba(237, 237, 237, 0.09);
-  --border-strong: rgba(237, 237, 237, 0.16);
+  --border-strong: rgba(237, 237, 237, 0.18);
   --text-primary: #ededed;
   --text-secondary: #a1a1a6;
   --text-muted: #85858b;
@@ -55,7 +55,7 @@ html.dark {
   --badge-rejected-text: #f87171;
   --badge-rejected-border: rgba(248, 113, 113, 0.24);
   --shadow-card: none;
-  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.42);
 }
 
 @theme inline {
@@ -69,17 +69,26 @@ body {
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
+.heading-hero {
+  font-size: clamp(2rem, 4.2vw, 3.25rem);
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
 .heading-4 {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-  font-weight: 600;
+  font-size: clamp(1.5rem, 2.8vw, 1.875rem);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  font-weight: 500;
   text-wrap: balance;
 }
 
 .heading-6 {
   font-size: 1.25rem;
   line-height: 1.75rem;
-  font-weight: 600;
+  font-weight: 500;
   text-wrap: balance;
 }
 
@@ -97,29 +106,29 @@ body {
 }
 
 .body-5 {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-weight: 500;
+  font-size: 0.9375rem;
+  line-height: 1.45rem;
+  font-weight: 400;
   text-wrap: pretty;
 }
 
 .body-6 {
   font-size: 0.875rem;
-  line-height: 1.25rem;
+  line-height: 1.35rem;
   font-weight: 400;
   text-wrap: pretty;
 }
 
 .button-md {
-  font-size: 1rem;
-  line-height: 1.5rem;
-  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
+  font-weight: 500;
 }
 
 .button-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .caption-4 {
@@ -134,6 +143,20 @@ body {
   font-weight: 400;
 }
 
+.paper-card-perf {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 96px;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -141,5 +164,6 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

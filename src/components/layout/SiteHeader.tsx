@@ -92,7 +92,7 @@ function MobileMenuDrawer({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-x-0 top-16 bottom-0 z-40 sm:hidden p-4 overflow-y-auto backdrop-blur-md"
+      className="fixed inset-x-0 top-14 sm:top-16 bottom-0 z-40 sm:hidden p-4 overflow-y-auto backdrop-blur-md"
       style={{
         backgroundColor: "color-mix(in srgb, var(--surface-primary) 96%, transparent)",
         borderTop: "1px solid var(--border-primary)",
@@ -134,24 +134,24 @@ export function SiteHeader({
   return (
     <>
       <header
-        className="sticky top-0 z-30 h-16 backdrop-blur-md transition-colors duration-200"
+        className="sticky top-0 z-30 h-14 sm:h-16 backdrop-blur-md transition-colors duration-200"
         style={{
-          backgroundColor: "color-mix(in srgb, var(--surface-primary) 88%, transparent)",
+          backgroundColor: "color-mix(in srgb, var(--surface-primary) 90%, transparent)",
           borderBottom: "1px solid var(--border-primary)",
         }}
       >
         <div className="max-w-7xl mx-auto h-full px-3 sm:px-4 md:px-6 flex items-center justify-between gap-2 sm:gap-4">
           <Link
             href="/"
-            className="flex items-center gap-2 shrink-0 rounded-lg py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+            className="flex items-center gap-2 min-w-0 shrink-0 rounded-lg py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
           >
             <span
-              className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#2563EB] text-white"
+              className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#2563EB] text-white shrink-0"
               aria-hidden="true"
             >
               <Books size={18} weight="regular" />
             </span>
-            <span className="title-3 text-[var(--text-primary)] tracking-tight">
+            <span className="title-3 text-[var(--text-primary)] tracking-tight truncate">
               B.Tech PaperVault
             </span>
           </Link>

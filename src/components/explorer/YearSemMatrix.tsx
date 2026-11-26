@@ -28,7 +28,7 @@ export function YearSemMatrix({
   return (
     <section
       aria-label="Academic year, semester, and exam filters"
-      className="rounded-xl p-3 sm:p-4 space-y-3"
+      className="rounded-xl p-3 sm:p-4"
       style={{
         backgroundColor: "var(--surface-primary)",
         border: "1px solid var(--border-primary)",
@@ -36,7 +36,7 @@ export function YearSemMatrix({
       }}
     >
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 min-w-0">
           <div className="flex items-center justify-between">
             <p className="caption-4 text-[var(--text-secondary)]">
               Year and semester
@@ -51,11 +51,11 @@ export function YearSemMatrix({
               </button>
             )}
           </div>
-          <div className="grid grid-cols-5 sm:flex sm:flex-wrap items-center gap-1.5">
+          <div className="flex sm:flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 sm:pb-0">
             <button
               type="button"
               onClick={() => onSelectYearSem(undefined, undefined)}
-              className={`col-span-1 h-10 sm:h-8 px-2.5 rounded-lg sm:rounded-md caption-4 transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
+              className={`shrink-0 h-9 sm:h-8 px-3 sm:px-2.5 rounded-lg caption-4 whitespace-nowrap transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
                 selectedYear === undefined && selectedSem === undefined
                   ? "bg-[#2563EB] text-white"
                   : "bg-[var(--surface-raised)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -72,7 +72,7 @@ export function YearSemMatrix({
                   onClick={() => onSelectYearSem(opt.year, opt.sem)}
                   aria-pressed={active}
                   title={opt.label}
-                  className={`h-10 sm:h-8 px-2 sm:px-2.5 rounded-lg sm:rounded-md font-mono caption-4 tabular-nums transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
+                  className={`shrink-0 h-9 sm:h-8 px-3 sm:px-2.5 rounded-lg font-mono caption-4 tabular-nums whitespace-nowrap transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
                     active
                       ? "bg-[#2563EB] text-white"
                       : "bg-[var(--surface-raised)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -85,14 +85,14 @@ export function YearSemMatrix({
           </div>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 min-w-0">
           <p className="caption-4 text-[var(--text-secondary)]">
             Exam category (Regular or Supply)
           </p>
           <div
             role="group"
             aria-label="Exam category filter"
-            className="flex flex-wrap sm:inline-flex items-center gap-1 p-1 rounded-lg bg-[var(--surface-raised)]"
+            className="flex sm:inline-flex items-center gap-1 p-1 rounded-lg bg-[var(--surface-raised)] overflow-x-auto no-scrollbar"
             style={{ border: "1px solid var(--border-primary)" }}
           >
             {EXAM_TABS.map((tab) => {
@@ -103,7 +103,7 @@ export function YearSemMatrix({
                   type="button"
                   onClick={() => onSelectExamType(tab.value)}
                   aria-pressed={active}
-                  className={`flex-1 sm:flex-initial h-9 sm:h-7 px-2.5 rounded-md caption-4 whitespace-nowrap transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
+                  className={`shrink-0 h-8 sm:h-7 px-2.5 rounded-md caption-4 whitespace-nowrap transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
                     active
                       ? "bg-[var(--surface-primary)] text-[var(--text-primary)] shadow-xs"
                       : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"

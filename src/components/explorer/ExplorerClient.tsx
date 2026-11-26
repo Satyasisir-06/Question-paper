@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
   Folder,
@@ -17,12 +18,32 @@ import type {
 } from "@/types/paper";
 import { EXAM_TYPE_META, type ExamTypeValue } from "@/lib/btech";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { HeroShowcase } from "@/components/explorer/HeroShowcase";
 import { YearSemMatrix } from "@/components/explorer/YearSemMatrix";
 import { FilterSidebar } from "@/components/explorer/FilterSidebar";
 import { PaperCard } from "@/components/explorer/PaperCard";
-import { FolderTree } from "@/components/explorer/FolderTree";
-import { PdfPreviewModal } from "@/components/pdf/PdfPreviewModal";
 import { safeReadApiJson } from "@/lib/httpClient";
+
+const FolderTree = dynamic(
+  () => import("@/components/explorer/FolderTree").then((mod) => mod.FolderTree),
+  {
+    loading: () => (
+      <div className="space-y-3">
+        {[1, 2, 3].map((idx) => (
+          <div
+            key={idx}
+            className="h-20 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]"
+          />
+        ))}
+      </div>
+    ),
+  }
+);
+
+const PdfPreviewModal = dynamic(
+  () => import("@/components/pdf/PdfPreviewModal").then((mod) => mod.PdfPreviewModal),
+  { ssr: false }
+);
 
 interface ExplorerClientProps {
   initialCatalog: FilterCatalogDto;
@@ -200,7 +221,7 @@ export function ExplorerClient({
     }
   };
 
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     setSearchQuery("");
     setYear(undefined);
     setSem(undefined);
@@ -209,7 +230,7 @@ export function ExplorerClient({
     setRegulation("");
     setExamYear("");
     setSort("newest");
-  };
+  }, []);
 
   const breadcrumbParts = useMemo(() => {
     const parts = ["B.Tech"];
@@ -222,11 +243,11 @@ export function ExplorerClient({
     return parts.join(" / ");
   }, [year, sem, branch, regulation, examType]);
 
-  const toggleSelect = (id: string) => {
+  const toggleSelect = useCallback((id: string) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
-  };
+  }, []);
 
   const uploadPrefillHref = useMemo(() => {
     const qs = new URLSearchParams();
@@ -240,8 +261,13 @@ export function ExplorerClient({
   const activeFilterCount =
     (branch ? 1 : 0) + (regulation ? 1 : 0) + (examYear ? 1 : 0);
 
+  const handleJumpToArchive = useCallback(() => {
+    const target = document.getElementById("archive-explorer");
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-[100dvh] flex flex-col">
       <SiteHeader
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -252,22 +278,26 @@ export function ExplorerClient({
         id="main-content"
         className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6"
       >
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4">
-          <div className="max-w-[680px] space-y-1">
-            <h1 className="heading-4 text-[var(--text-primary)]">
-              B.Tech question paper archive
-            </h1>
-            <p className="body-6 text-[var(--text-secondary)]">
-              Filter verified previous papers by year, semester, branch, and
-              regular or supply exam category, or download an entire folder as a
-              ZIP archive.
-            </p>
-          </div>
+        <HeroShowcase
+          catalog={initialCatalog}
+          totalCatalogPapers={initialTotal}
+          selectedBranch={branch}
+          selectedYear={year}
+          selectedSem={sem}
+          onQuickBranch={setBranch}
+          onQuickYearSem={(y, s) => {
+            setYear(y);
+            setSem(s);
+          }}
+          onJumpToArchive={handleJumpToArchive}
+        />
+
+        <div id="archive-explorer" className="scroll-mt-20 space-y-3 sm:space-y-4">
           <div className="md:hidden relative">
             <MagnifyingGlass
               size={16}
               weight="regular"
-              className="absolute left-3 top-3.5 text-[var(--text-muted)] pointer-events-none"
+              className="absolute left-3.5 top-3.5 text-[var(--text-muted)] pointer-events-none"
             />
             <input
               type="search"
@@ -275,22 +305,58 @@ export function ExplorerClient({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search subject code or name"
               aria-label="Search subject code or name"
-              className="w-full h-11 pl-9 pr-3 rounded-xl text-base sm:text-sm bg-[var(--surface-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
+              className="w-full h-11 pl-10 pr-3 rounded-xl text-base sm:text-sm bg-[var(--surface-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
               style={{ border: "1px solid var(--border-primary)" }}
             />
           </div>
-        </div>
 
-        <YearSemMatrix
-          selectedYear={year}
-          selectedSem={sem}
-          selectedExamType={examType}
-          onSelectYearSem={(y, s) => {
-            setYear(y);
-            setSem(s);
-          }}
-          onSelectExamType={setExamType}
-        />
+          {initialCatalog.branches.length > 0 && (
+            <div
+              aria-label="Quick branch filter"
+              className="lg:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5"
+            >
+              <button
+                type="button"
+                onClick={() => setBranch("")}
+                className={`shrink-0 h-8 px-3 rounded-lg caption-4 transition-colors duration-200 cursor-pointer ${
+                  branch === ""
+                    ? "bg-[#2563EB] text-white"
+                    : "bg-[var(--surface-primary)] text-[var(--text-secondary)] border border-[var(--border-primary)]"
+                }`}
+              >
+                All branches
+              </button>
+              {initialCatalog.branches.map((br) => {
+                const active = branch === br.code;
+                return (
+                  <button
+                    key={br.id}
+                    type="button"
+                    onClick={() => setBranch(active ? "" : br.code)}
+                    className={`shrink-0 h-8 px-3 rounded-lg font-mono caption-4 transition-colors duration-200 cursor-pointer ${
+                      active
+                        ? "bg-[#2563EB] text-white"
+                        : "bg-[var(--surface-primary)] text-[var(--text-secondary)] border border-[var(--border-primary)]"
+                    }`}
+                  >
+                    {br.code}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          <YearSemMatrix
+            selectedYear={year}
+            selectedSem={sem}
+            selectedExamType={examType}
+            onSelectYearSem={(y, s) => {
+              setYear(y);
+              setSem(s);
+            }}
+            onSelectExamType={setExamType}
+          />
+        </div>
 
         <div className="flex items-start gap-6">
           <FilterSidebar
@@ -308,39 +374,73 @@ export function ExplorerClient({
             onReset={resetFilters}
           />
 
-          <div className="flex-1 min-w-0 space-y-4">
+          <div className="flex-1 min-w-0 space-y-3 sm:space-y-4">
             <div
-              className="rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3"
+              className="rounded-xl px-3.5 py-2.5 sm:px-4 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3"
               style={{
                 backgroundColor: "var(--surface-primary)",
                 border: "1px solid var(--border-primary)",
               }}
             >
-              <div className="flex flex-wrap items-center gap-2 min-w-0">
-                <button
-                  type="button"
-                  onClick={() => setMobileFiltersOpen(true)}
-                  className="lg:hidden inline-flex items-center gap-1.5 h-10 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)]"
+              <div className="flex items-center justify-between gap-2 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 min-w-0">
+                  <button
+                    type="button"
+                    onClick={() => setMobileFiltersOpen(true)}
+                    className="lg:hidden inline-flex items-center gap-1.5 h-9 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] shrink-0"
+                    style={{ border: "1px solid var(--border-primary)" }}
+                  >
+                    <Funnel size={15} weight="regular" />
+                    <span>
+                      Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+                    </span>
+                  </button>
+                  <span className="font-mono caption-4 text-[var(--text-secondary)] truncate">
+                    {breadcrumbParts}
+                  </span>
+                  <span className="font-mono caption-5 text-[var(--text-muted)] tabular-nums shrink-0">
+                    · {total} {total === 1 ? "paper" : "papers"}
+                  </span>
+                </div>
+
+                <div
+                  role="group"
+                  aria-label="Browse view mode"
+                  className="sm:hidden inline-flex p-0.5 rounded-lg bg-[var(--surface-raised)] shrink-0"
                   style={{ border: "1px solid var(--border-primary)" }}
                 >
-                  <Funnel size={16} weight="regular" />
-                  <span>
-                    Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
-                  </span>
-                </button>
-                <span className="font-mono caption-4 text-[var(--text-secondary)] truncate">
-                  {breadcrumbParts}
-                </span>
-                <span className="font-mono caption-5 text-[var(--text-muted)] tabular-nums">
-                  · {total} {total === 1 ? "paper" : "papers"}
-                </span>
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchView("cards")}
+                    aria-label="List view"
+                    className={`inline-flex items-center justify-center w-9 h-8 rounded-md cursor-pointer ${
+                      viewMode === "cards"
+                        ? "bg-[var(--surface-primary)] text-[var(--text-primary)] shadow-xs"
+                        : "text-[var(--text-secondary)]"
+                    }`}
+                  >
+                    <ListBullets size={15} weight="regular" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSwitchView("folders")}
+                    aria-label="Folder view"
+                    className={`inline-flex items-center justify-center w-9 h-8 rounded-md cursor-pointer ${
+                      viewMode === "folders"
+                        ? "bg-[var(--surface-primary)] text-[var(--text-primary)] shadow-xs"
+                        : "text-[var(--text-secondary)]"
+                    }`}
+                  >
+                    <Folder size={15} weight="regular" />
+                  </button>
+                </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
                 <div
                   role="group"
                   aria-label="Browse view mode"
-                  className="inline-flex p-1 rounded-lg bg-[var(--surface-raised)]"
+                  className="hidden sm:inline-flex p-1 rounded-lg bg-[var(--surface-raised)]"
                   style={{ border: "1px solid var(--border-primary)" }}
                 >
                   <button
@@ -386,7 +486,7 @@ export function ExplorerClient({
                         },
                       })
                     }
-                    className="inline-flex items-center gap-2 h-9 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] disabled:opacity-60 transition-[opacity,transform] duration-200 cursor-pointer"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-9 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] disabled:opacity-60 transition-[opacity,transform] duration-200 cursor-pointer"
                     style={{ border: "1px solid var(--border-primary)" }}
                   >
                     <Package size={16} weight="regular" />
@@ -550,10 +650,34 @@ export function ExplorerClient({
         </div>
       </main>
 
-      <PdfPreviewModal
-        paper={previewPaper}
-        onClose={() => setPreviewPaper(null)}
-      />
+      <footer className="border-t border-[var(--border-primary)] bg-[var(--surface-primary)] mt-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="space-y-0.5">
+            <p className="title-4 text-[var(--text-primary)]">B.Tech PaperVault</p>
+            <p className="caption-5 text-[var(--text-muted)]">
+              Verified B.Tech Regular, Supply, and Midterm question paper index.
+            </p>
+          </div>
+          <nav aria-label="Footer navigation" className="flex flex-wrap items-center gap-4 caption-4 text-[var(--text-secondary)]">
+            <Link href="/track" className="hover:text-[var(--text-primary)]">
+              Track upload
+            </Link>
+            <Link href="/admin" className="hover:text-[var(--text-primary)]">
+              Admin
+            </Link>
+            <Link href="/upload" className="text-[#2563EB] hover:underline">
+              Upload paper
+            </Link>
+          </nav>
+        </div>
+      </footer>
+
+      {previewPaper && (
+        <PdfPreviewModal
+          paper={previewPaper}
+          onClose={() => setPreviewPaper(null)}
+        />
+      )}
     </div>
   );
 }
