@@ -279,16 +279,9 @@ export function ExplorerClient({
         className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6"
       >
         <HeroShowcase
-          catalog={initialCatalog}
+          branchCount={initialCatalog.branches.length}
+          subjectCount={initialCatalog.subjects.length}
           totalCatalogPapers={initialTotal}
-          selectedBranch={branch}
-          selectedYear={year}
-          selectedSem={sem}
-          onQuickBranch={setBranch}
-          onQuickYearSem={(y, s) => {
-            setYear(y);
-            setSem(s);
-          }}
           onJumpToArchive={handleJumpToArchive}
         />
 
