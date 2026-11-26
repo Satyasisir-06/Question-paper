@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { getDb } from "@/server/db/client";
 import { PaperService } from "@/server/services/paperService";
 import { ExplorerClient } from "@/components/explorer/ExplorerClient";
+import { sanitizeConnectionError } from "@/lib/env";
 import type { FilterCatalogDto, PaperDto } from "@/types/paper";
 
 const EMPTY_CATALOG: FilterCatalogDto = {
@@ -11,11 +12,6 @@ const EMPTY_CATALOG: FilterCatalogDto = {
   subjects: [],
   examYears: [],
 };
-
-function sanitizeLoadError(err: unknown): string {
-  const msg = err instanceof Error ? err.message : "Database connection failed.";
-  return msg.replace(/postgres(?:ql)?:\/\/[^\s"']+/gi, "[REDACTED_DATABASE_URL]");
-}
 
 async function ExplorerLoader() {
   await connection();
@@ -41,7 +37,7 @@ async function ExplorerLoader() {
     total = searchRes.meta.total;
   } catch (err) {
     console.error("[explorer] failed to load archive:", err);
-    initialError = `Unable to connect to archive database (${sanitizeLoadError(err)}). Check Vercel Environment Variables or /api/v1/health.`;
+    initialError = `Unable to connect to archive database (${sanitizeConnectionError(err)}). Check Vercel Environment Variables or /api/v1/health.`;
   }
 
   return (

@@ -8,17 +8,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { Readable } from "node:stream";
 import { assertSafeStorageKey, type StorageProvider } from "./storageProvider";
-
-function cleanEnvValue(value?: string): string {
-  const trimmed = value?.trim() ?? "";
-  if (
-    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-    (trimmed.startsWith("'") && trimmed.endsWith("'"))
-  ) {
-    return trimmed.slice(1, -1).trim();
-  }
-  return trimmed;
-}
+import { cleanEnvValue } from "@/lib/env";
 
 /** S3 / Cloudflare R2 object storage adapter for production deployments. */
 export class S3StorageProvider implements StorageProvider {

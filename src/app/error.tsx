@@ -1,18 +1,37 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { extractErrorDigest, formatUiServerError } from "@/lib/env";
+
+const FALLBACK_MESSAGE =
+  "Unable to load this page due to a server configuration or database connection error. Verify your Vercel Environment Variables or check /api/v1/health.";
 
 export default function AppError({
   error,
+  retry,
   reset,
 }: {
-  error: Error & { digest?: string };
-  reset: () => void;
+  error: unknown;
+  retry?: () => void;
+  reset?: () => void;
 }) {
-  const safeMessage =
-    error.message && !/postgres(?:ql)?:\/\//i.test(error.message)
-      ? error.message
-      : "Unable to load this page due to a server configuration or connection error.";
+  useEffect(() => {
+    console.error("[app-error]", error);
+  }, [error]);
+
+  const digest = extractErrorDigest(error);
+  const safeMessage = formatUiServerError(error, FALLBACK_MESSAGE);
+
+  const handleRecover = () => {
+    if (typeof retry === "function") {
+      retry();
+    } else if (typeof reset === "function") {
+      reset();
+    } else {
+      window.location.reload();
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
@@ -28,10 +47,15 @@ export default function AppError({
           Service temporarily unavailable
         </h1>
         <p className="body-6 text-[var(--text-secondary)]">{safeMessage}</p>
+        {digest && (
+          <p className="font-mono caption-5 text-[var(--text-muted)]">
+            Error digest: {digest}
+          </p>
+        )}
         <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
           <button
             type="button"
-            onClick={reset}
+            onClick={handleRecover}
             className="h-9 px-4 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] cursor-pointer"
           >
             Try again

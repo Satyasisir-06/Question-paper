@@ -9,7 +9,9 @@ import { getDb } from "@/server/db/client";
 import { PaperService } from "@/server/services/paperService";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ExamTypeBadge } from "@/components/ui/ExamBadge";
+import { ServerErrorBanner } from "@/components/ui/ServerErrorBanner";
 import { PdfViewer } from "@/components/pdf/PdfViewer";
+import { sanitizeConnectionError } from "@/lib/env";
 import {
   EXAM_TYPE_META,
   formatExamMonth,
@@ -59,9 +61,25 @@ async function PaperDetailContent({
     notFound();
   }
 
-  const db = await getDb();
-  const service = new PaperService(db);
-  const paper = await service.getApprovedPaper(id);
+  let paper: Awaited<ReturnType<PaperService["getApprovedPaper"]>> = null;
+  let dbError = "";
+  try {
+    const db = await getDb();
+    const service = new PaperService(db);
+    paper = await service.getApprovedPaper(id);
+  } catch (err) {
+    console.error("[paper-detail] load error:", err);
+    dbError = `Unable to connect to archive database (${sanitizeConnectionError(err)}). Check Vercel Environment Variables or /api/v1/health.`;
+  }
+
+  if (dbError) {
+    return (
+      <main id="main-content" className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-4 md:px-6 py-8">
+        <ServerErrorBanner message={dbError} />
+      </main>
+    );
+  }
+
   if (!paper) {
     notFound();
   }

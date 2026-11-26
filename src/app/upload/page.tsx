@@ -4,7 +4,9 @@ import { connection } from "next/server";
 import { getDb } from "@/server/db/client";
 import { PaperService } from "@/server/services/paperService";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { ServerErrorBanner } from "@/components/ui/ServerErrorBanner";
 import { UploadFormClient } from "@/components/upload/UploadFormClient";
+import { sanitizeConnectionError } from "@/lib/env";
 import type { ExamTypeValue } from "@/lib/btech";
 import type { FilterCatalogDto } from "@/types/paper";
 
@@ -37,7 +39,7 @@ async function UploadPageBody({
     catalog = await service.getFilters();
   } catch (err) {
     console.error("[upload] catalog load error:", err);
-    dbError = "Database is currently unreachable. Check DATABASE_URL in Vercel settings.";
+    dbError = `Database is currently unreachable (${sanitizeConnectionError(err)}). Check Vercel Environment Variables or /api/v1/health.`;
   }
 
   const yearNum = Number(sp.year);
@@ -47,19 +49,7 @@ async function UploadPageBody({
     examRaw === "REGULAR" || examRaw === "SUPPLY" ? (examRaw as ExamTypeValue) : undefined;
 
   if (dbError) {
-    return (
-      <div
-        role="alert"
-        className="max-w-2xl mx-auto rounded-2xl p-6 body-6"
-        style={{
-          backgroundColor: "var(--badge-rejected-bg)",
-          color: "var(--badge-rejected-text)",
-          border: "1px solid var(--badge-rejected-border)",
-        }}
-      >
-        {dbError}
-      </div>
-    );
+    return <ServerErrorBanner message={dbError} />;
   }
 
   return (

@@ -6,58 +6,20 @@ import { hashPassword } from "@/server/auth/session";
 import { computeSha256 } from "@/server/validators/pdfValidator";
 import type { StorageProvider } from "@/server/storage";
 import { EXAM_TYPE_META, formatExamMonth, formatYearSemCode, type ExamTypeValue } from "@/lib/btech";
+import { cleanEnvValue } from "@/lib/env";
+import {
+  DEFAULT_BRANCHES,
+  DEFAULT_REGULATIONS,
+  DEFAULT_SUBJECTS,
+  ensureCoreCatalog,
+} from "./catalogBootstrap";
 
-export const DEFAULT_BRANCHES = [
-  { code: "CAI", name: "CSE (Artificial Intelligence)" },
-  { code: "CSM", name: "CSE (Artificial Intelligence & Machine Learning)" },
-  { code: "CSD", name: "CSE (Data Science)" },
-  { code: "CSE", name: "Computer Science & Engineering" },
-  { code: "ECE", name: "Electronics & Communication Engineering" },
-  { code: "EEE", name: "Electrical & Electronics Engineering" },
-  { code: "MECH", name: "Mechanical Engineering" },
-  { code: "CIVI", name: "Civil Engineering" },
-  { code: "COMMON", name: "Basic Sciences & Humanities (1st Year)" },
-] as const;
-
-export const DEFAULT_REGULATIONS = [
-  { code: "R23", startYear: 2023 },
-  { code: "R22", startYear: 2022 },
-  { code: "R20", startYear: 2020 },
-] as const;
-
-interface SeedSubjectSpec {
-  code: string;
-  name: string;
-  branchCode: string;
-  regulationCode: string;
-  yearOfStudy: number;
-  semester: number;
-  isCommonFirstYear?: boolean;
-}
-
-export const DEFAULT_SUBJECTS: SeedSubjectSpec[] = [
-  { code: "MA101", name: "Linear Algebra and Calculus", branchCode: "COMMON", regulationCode: "R23", yearOfStudy: 1, semester: 1, isCommonFirstYear: true },
-  { code: "CS102", name: "Introduction to Programming", branchCode: "COMMON", regulationCode: "R23", yearOfStudy: 1, semester: 1, isCommonFirstYear: true },
-  { code: "MA102", name: "Differential Equations and Vector Calculus", branchCode: "COMMON", regulationCode: "R23", yearOfStudy: 1, semester: 2, isCommonFirstYear: true },
-  { code: "PH102", name: "Engineering Physics", branchCode: "COMMON", regulationCode: "R23", yearOfStudy: 1, semester: 2, isCommonFirstYear: true },
-  { code: "CS201", name: "Data Structures", branchCode: "CSE", regulationCode: "R22", yearOfStudy: 2, semester: 3 },
-  { code: "CS202", name: "Discrete Mathematics", branchCode: "CSE", regulationCode: "R22", yearOfStudy: 2, semester: 3 },
-  { code: "CS401", name: "Database Management Systems", branchCode: "CSE", regulationCode: "R22", yearOfStudy: 2, semester: 4 },
-  { code: "CS402", name: "Operating Systems", branchCode: "CSE", regulationCode: "R22", yearOfStudy: 2, semester: 4 },
-  { code: "EC301", name: "Signals and Systems", branchCode: "ECE", regulationCode: "R22", yearOfStudy: 2, semester: 3 },
-  { code: "EC402", name: "Analog and Digital Communications", branchCode: "ECE", regulationCode: "R22", yearOfStudy: 2, semester: 4 },
-  { code: "CS501", name: "Computer Networks", branchCode: "CSE", regulationCode: "R22", yearOfStudy: 3, semester: 5 },
-  { code: "CS502", name: "Formal Languages and Automata Theory", branchCode: "CSE", regulationCode: "R22", yearOfStudy: 3, semester: 5 },
-  { code: "CS601", name: "Compiler Design", branchCode: "CSE", regulationCode: "R20", yearOfStudy: 3, semester: 6 },
-  { code: "AI602", name: "Machine Learning Foundations", branchCode: "CAI", regulationCode: "R22", yearOfStudy: 3, semester: 6 },
-  { code: "SM501", name: "Neural Networks and Deep Learning", branchCode: "CSM", regulationCode: "R22", yearOfStudy: 3, semester: 5 },
-  { code: "DS502", name: "Big Data Analytics", branchCode: "CSD", regulationCode: "R22", yearOfStudy: 3, semester: 5 },
-  { code: "ME501", name: "Heat Transfer", branchCode: "MECH", regulationCode: "R20", yearOfStudy: 3, semester: 5 },
-  { code: "EE401", name: "Power Systems I", branchCode: "EEE", regulationCode: "R22", yearOfStudy: 2, semester: 4 },
-  { code: "CE601", name: "Structural Analysis II", branchCode: "CIVI", regulationCode: "R20", yearOfStudy: 3, semester: 6 },
-  { code: "CS701", name: "Cloud Computing", branchCode: "CSE", regulationCode: "R20", yearOfStudy: 4, semester: 7 },
-  { code: "CS801", name: "Distributed Systems", branchCode: "CSE", regulationCode: "R20", yearOfStudy: 4, semester: 8 },
-];
+export {
+  DEFAULT_BRANCHES,
+  DEFAULT_REGULATIONS,
+  DEFAULT_SUBJECTS,
+  ensureCoreCatalog,
+};
 
 interface SamplePaperSpec {
   trackingCode: string;
@@ -242,9 +204,9 @@ export async function seedDatabase(
     .returning();
   const subjectByCode = new Map(subjectRows.map((s) => [s.code, s]));
 
-  const adminEmail = cleanSeedEnv(process.env.ADMIN_SEED_EMAIL) || "admin@college.edu";
-  const adminPassword = cleanSeedEnv(process.env.ADMIN_SEED_PASSWORD) || "Admin@12345";
-  const adminName = cleanSeedEnv(process.env.ADMIN_SEED_NAME) || "Exam Cell Admin";
+  const adminEmail = cleanEnvValue(process.env.ADMIN_SEED_EMAIL) || "admin@college.edu";
+  const adminPassword = cleanEnvValue(process.env.ADMIN_SEED_PASSWORD) || "Admin@12345";
+  const adminName = cleanEnvValue(process.env.ADMIN_SEED_NAME) || "Exam Cell Admin";
   const passwordHash = await hashPassword(adminPassword);
 
   const [adminUser] = await db
@@ -354,98 +316,20 @@ export async function syncDefaultBranches(db: AppDb): Promise<void> {
   }
 }
 
-function cleanSeedEnv(value?: string): string {
-  const trimmed = value?.trim() ?? "";
-  if (
-    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-    (trimmed.startsWith("'") && trimmed.endsWith("'"))
-  ) {
-    return trimmed.slice(1, -1).trim();
-  }
-  return trimmed;
-}
-
-/**
- * Idempotently ensure baseline B.Tech branches, regulations, starter subjects,
- * and optional configured admin account exist on empty remote PostgreSQL deployments.
- */
-export async function ensureCoreCatalog(db: AppDb): Promise<void> {
-  const existingBranches = await db.select({ value: count() }).from(branches);
-  if ((existingBranches[0]?.value ?? 0) === 0) {
-    await db
-      .insert(branches)
-      .values(DEFAULT_BRANCHES.map((b) => ({ code: b.code, name: b.name })))
-      .onConflictDoNothing();
-
-    await db
-      .insert(regulations)
-      .values(
-        DEFAULT_REGULATIONS.map((r) => ({ code: r.code, startYear: r.startYear }))
-      )
-      .onConflictDoNothing();
-
-    const [branchRows, regRows] = await Promise.all([
-      db.select().from(branches),
-      db.select().from(regulations),
-    ]);
-    const branchByCode = new Map(branchRows.map((b) => [b.code, b]));
-    const regByCode = new Map(regRows.map((r) => [r.code, r]));
-
-    const subjectValues = DEFAULT_SUBJECTS.flatMap((s) => {
-      const branch = branchByCode.get(s.branchCode);
-      const reg = regByCode.get(s.regulationCode);
-      if (!branch || !reg) return [];
-      return [
-        {
-          code: s.code,
-          name: s.name,
-          branchId: branch.id,
-          regulationId: reg.id,
-          yearOfStudy: s.yearOfStudy,
-          semester: s.semester,
-          isCommonFirstYear: s.isCommonFirstYear ?? false,
-        },
-      ];
-    });
-
-    if (subjectValues.length > 0) {
-      await db.insert(subjects).values(subjectValues).onConflictDoNothing();
-    }
-  }
-
-  const configuredEmail = cleanSeedEnv(process.env.ADMIN_SEED_EMAIL).toLowerCase();
-  const configuredPassword = cleanSeedEnv(process.env.ADMIN_SEED_PASSWORD);
-  if (configuredEmail && configuredPassword) {
-    const existingUsers = await db.select({ value: count() }).from(users);
-    if ((existingUsers[0]?.value ?? 0) === 0) {
-      const passwordHash = await hashPassword(configuredPassword);
-      await db
-        .insert(users)
-        .values({
-          email: configuredEmail,
-          name: cleanSeedEnv(process.env.ADMIN_SEED_NAME) || "Exam Cell Admin",
-          passwordHash,
-          role: "ADMIN",
-        })
-        .onConflictDoNothing();
-    }
-  }
-}
-
 /** Ensure admin user exists without wiping existing papers. */
 export async function ensureAdminUser(db: AppDb): Promise<void> {
-  const email = (cleanSeedEnv(process.env.ADMIN_SEED_EMAIL) || "admin@college.edu").toLowerCase();
+  const email = (cleanEnvValue(process.env.ADMIN_SEED_EMAIL) || "admin@college.edu").toLowerCase();
   const existing = await db.select().from(users).where(eq(users.email, email));
   if (existing.length > 0) return;
 
   const passwordHash = await hashPassword(
-    cleanSeedEnv(process.env.ADMIN_SEED_PASSWORD) || "Admin@12345"
+    cleanEnvValue(process.env.ADMIN_SEED_PASSWORD) || "Admin@12345"
   );
   await db
     .insert(users)
     .values({
       email,
-      name: cleanSeedEnv(process.env.ADMIN_SEED_NAME) || "Exam Cell Admin",
+      name: cleanEnvValue(process.env.ADMIN_SEED_NAME) || "Exam Cell Admin",
       passwordHash,
       role: "ADMIN",
     })

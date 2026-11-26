@@ -4,38 +4,27 @@ import { count } from "drizzle-orm";
 import { getDb } from "@/server/db/client";
 import { branches } from "@/server/db/schema";
 import { getStorageProvider } from "@/server/storage";
-
-function stripWrappingQuotes(value?: string): string {
-  const trimmed = value?.trim() ?? "";
-  if (
-    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-    (trimmed.startsWith("'") && trimmed.endsWith("'"))
-  ) {
-    return trimmed.slice(1, -1).trim();
-  }
-  return trimmed;
-}
-
-function sanitizeErrorMessage(err: unknown): string {
-  const msg = err instanceof Error ? err.message : "Unknown server error";
-  return msg.replace(/postgres(?:ql)?:\/\/[^\s"']+/gi, "[REDACTED_DATABASE_URL]");
-}
+import {
+  cleanEnvValue,
+  resolveDatabaseUrl,
+  sanitizeConnectionError,
+} from "@/lib/env";
 
 /** Safe runtime health diagnostic endpoint exposing zero secrets. */
 export async function GET() {
   await connection();
-  const dbUrl = stripWrappingQuotes(process.env.DATABASE_URL);
-  const storageMode = stripWrappingQuotes(process.env.STORAGE_PROVIDER) || "local";
+  const dbUrl = resolveDatabaseUrl();
+  const storageMode = cleanEnvValue(process.env.STORAGE_PROVIDER) || "local";
   const envChecks = {
     hasPostgresUrl:
       dbUrl.startsWith("postgres://") || dbUrl.startsWith("postgresql://"),
     isPoolerHost: dbUrl.includes("pooler.supabase.com"),
     storageProvider: storageMode,
-    hasS3Bucket: Boolean(stripWrappingQuotes(process.env.S3_BUCKET)),
+    hasS3Bucket: Boolean(cleanEnvValue(process.env.S3_BUCKET)),
     hasS3Keys:
-      Boolean(stripWrappingQuotes(process.env.S3_ACCESS_KEY_ID)) &&
-      Boolean(stripWrappingQuotes(process.env.S3_SECRET_ACCESS_KEY)),
-    hasSessionSecret: stripWrappingQuotes(process.env.SESSION_SECRET).length >= 32,
+      Boolean(cleanEnvValue(process.env.S3_ACCESS_KEY_ID)) &&
+      Boolean(cleanEnvValue(process.env.S3_SECRET_ACCESS_KEY)),
+    hasSessionSecret: cleanEnvValue(process.env.SESSION_SECRET).length >= 32,
   };
 
   let dbConnected = false;
@@ -49,14 +38,14 @@ export async function GET() {
     branchCount = Number(res[0]?.value ?? 0);
     dbConnected = true;
   } catch (err) {
-    errorDetail = `DB: ${sanitizeErrorMessage(err)}`;
+    errorDetail = `DB: ${sanitizeConnectionError(err)}`;
   }
 
   try {
     getStorageProvider();
     storageReady = true;
   } catch (err) {
-    const msg = `Storage: ${sanitizeErrorMessage(err)}`;
+    const msg = `Storage: ${sanitizeConnectionError(err)}`;
     errorDetail = errorDetail ? `${errorDetail} | ${msg}` : msg;
   }
 

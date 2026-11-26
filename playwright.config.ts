@@ -26,6 +26,9 @@ export default defineConfig({
     timeout: 60_000,
     env: {
       ...process.env,
+      DATABASE_URL: "pglite://./data/pgdata",
+      STORAGE_PROVIDER: "local",
+      LOCAL_STORAGE_DIR: "./storage",
       SESSION_SECRET: "playwright-e2e-session-secret-longer-than-32-chars-012345",
     },
   },

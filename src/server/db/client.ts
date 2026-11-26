@@ -6,7 +6,8 @@ import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Pool } from "pg";
 import * as schema from "./schema";
 import { SCHEMA_DDL } from "./ddl";
-import { ensureCoreCatalog } from "./seedData";
+import { ensureCoreCatalog } from "./catalogBootstrap";
+import { resolveDatabaseUrl } from "@/lib/env";
 
 export type AppDb = PgliteDatabase<typeof schema> | NodePgDatabase<typeof schema>;
 
@@ -15,17 +16,6 @@ const globalForDb = globalThis as unknown as {
   __pvPglite?: PGlite;
   __pvPgPool?: Pool;
 };
-
-function cleanEnvValue(value?: string): string {
-  const trimmed = value?.trim() ?? "";
-  if (
-    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-    (trimmed.startsWith("'") && trimmed.endsWith("'"))
-  ) {
-    return trimmed.slice(1, -1).trim();
-  }
-  return trimmed;
-}
 
 function resolvePgSslOption(url: string): { rejectUnauthorized: boolean } | undefined {
   if (/localhost|127\.0\.0\.1/i.test(url)) return undefined;
@@ -46,7 +36,7 @@ function normalizePgConnectionString(url: string, hasCustomSsl: boolean): string
 }
 
 async function initDb(): Promise<AppDb> {
-  const url = cleanEnvValue(process.env.DATABASE_URL) || "pglite://./data/pgdata";
+  const url = resolveDatabaseUrl() || "pglite://./data/pgdata";
 
   if (url.startsWith("postgres://") || url.startsWith("postgresql://")) {
     const [{ Pool: PgPool }, { drizzle: drizzlePg }] = await Promise.all([

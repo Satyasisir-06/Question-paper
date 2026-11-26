@@ -1,21 +1,11 @@
 import { LocalStorageProvider } from "./localStorageProvider";
 import { S3StorageProvider } from "./s3StorageProvider";
 import type { StorageProvider } from "./storageProvider";
+import { cleanEnvValue } from "@/lib/env";
 
 const globalForStorage = globalThis as unknown as {
   __pvStorageProvider?: StorageProvider;
 };
-
-function cleanEnvValue(value?: string): string {
-  const trimmed = value?.trim() ?? "";
-  if (
-    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-    (trimmed.startsWith("'") && trimmed.endsWith("'"))
-  ) {
-    return trimmed.slice(1, -1).trim();
-  }
-  return trimmed;
-}
 
 /** Resolve active StorageProvider singleton (local filesystem or S3/R2). */
 export function getStorageProvider(): StorageProvider {

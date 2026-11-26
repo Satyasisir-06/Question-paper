@@ -2,6 +2,7 @@ import { randomBytes, scrypt as scryptCb, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
+import { cleanEnvValue } from "@/lib/env";
 
 const scrypt = promisify(scryptCb);
 
@@ -16,12 +17,7 @@ export interface SessionUser {
 }
 
 function getSecretKey(): Uint8Array {
-  const rawTrimmed = process.env.SESSION_SECRET?.trim() ?? "";
-  const raw =
-    (rawTrimmed.startsWith('"') && rawTrimmed.endsWith('"')) ||
-    (rawTrimmed.startsWith("'") && rawTrimmed.endsWith("'"))
-      ? rawTrimmed.slice(1, -1).trim()
-      : rawTrimmed;
+  const raw = cleanEnvValue(process.env.SESSION_SECRET);
   if (raw && raw.length >= 32) {
     return new TextEncoder().encode(raw);
   }
