@@ -15,6 +15,7 @@ import {
   zipDownloadSchema,
 } from "@/server/validators/schemas";
 import { verifySameOrigin } from "@/server/auth/guards";
+import { safeReadApiJson } from "@/lib/httpClient";
 
 describe("API helpers, schemas, and stream adapter", () => {
   it("builds consistent success and error envelopes", async () => {
@@ -81,16 +82,59 @@ describe("API helpers, schemas, and stream adapter", () => {
     expect(invalidSem.success).toBe(false);
   });
 
-  it("checks same-origin for CSRF protection", () => {
+  it("checks same-origin including forwarded host headers", () => {
     const same = new NextRequest("http://localhost:3000/api/v1/auth/logout", {
       method: "POST",
       headers: { host: "localhost:3000", origin: "http://localhost:3000" },
+    });
+    const forwarded = new NextRequest("http://internal:3000/api/v1/auth/logout", {
+      method: "POST",
+      headers: {
+        host: "internal:3000",
+        "x-forwarded-host": "papervault.vercel.app, proxy.internal",
+        origin: "https://papervault.vercel.app",
+      },
     });
     const cross = new NextRequest("http://localhost:3000/api/v1/auth/logout", {
       method: "POST",
       headers: { host: "localhost:3000", origin: "https://evil.example" },
     });
     expect(verifySameOrigin(same)).toBe(true);
+    expect(verifySameOrigin(forwarded)).toBe(true);
     expect(verifySameOrigin(cross)).toBe(false);
+  });
+
+  it("safely parses JSON API envelopes and falls back cleanly on non-JSON 500 responses", async () => {
+    const okRes = new Response(
+      JSON.stringify({ success: true, data: { token: "ok" }, meta: { total: 1 } }),
+      { status: 200 }
+    );
+    const parsedOk = await safeReadApiJson<{ token: string }>(okRes, "Failed");
+    expect(parsedOk).toEqual({
+      ok: true,
+      data: { token: "ok" },
+      meta: { total: 1 },
+      errorMessage: "",
+    });
+
+    const apiErrRes = new Response(
+      JSON.stringify({
+        success: false,
+        data: null,
+        error: { code: "BAD", message: "SESSION_SECRET missing" },
+      }),
+      { status: 500 }
+    );
+    const parsedErr = await safeReadApiJson(apiErrRes, "Fallback");
+    expect(parsedErr).toEqual({
+      ok: false,
+      data: null,
+      errorMessage: "SESSION_SECRET missing",
+    });
+
+    const htmlErrRes = new Response("Internal Server Error", { status: 500 });
+    const parsedHtml = await safeReadApiJson(htmlErrRes, "Sign-in failed");
+    expect(parsedHtml.ok).toBe(false);
+    expect(parsedHtml.errorMessage).toContain("HTTP 500");
   });
 });

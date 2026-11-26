@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { apiError, apiSuccess } from "@/lib/apiResponse";
+import { sanitizeConnectionError } from "@/lib/env";
 import { requireAdminApi } from "@/server/auth/guards";
 import { getDb } from "@/server/db/client";
 import { getStorageProvider } from "@/server/storage";
@@ -16,8 +17,12 @@ export async function GET(request: NextRequest) {
     return apiError("INVALID_STATUS", "Invalid moderation status filter.", 400);
   }
 
-  const db = await getDb();
-  const service = new ModerationService(db, getStorageProvider());
-  const items = await service.listAdminPapers(parsed.data);
-  return apiSuccess(items);
+  try {
+    const db = await getDb();
+    const service = new ModerationService(db, getStorageProvider());
+    const items = await service.listAdminPapers(parsed.data);
+    return apiSuccess(items);
+  } catch (err) {
+    return apiError("ADMIN_LIST_FAILED", sanitizeConnectionError(err), 500);
+  }
 }

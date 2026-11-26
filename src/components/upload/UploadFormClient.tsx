@@ -23,6 +23,7 @@ import {
   UploadSimple,
 } from "@phosphor-icons/react";
 import type { FilterCatalogDto } from "@/types/paper";
+import { safeReadApiJson } from "@/lib/httpClient";
 import {
   formatFileSize,
   getSemestersForYear,
@@ -398,17 +399,20 @@ export function UploadFormClient({
         method: "POST",
         body: fd,
       });
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        setSubmitError(json.error?.message ?? "Unable to submit question paper.");
+      const parsed = await safeReadApiJson<{ trackingCode: string; pageCount: number }>(
+        res,
+        "Unable to submit question paper."
+      );
+      if (!parsed.ok || !parsed.data) {
+        setSubmitError(parsed.errorMessage);
         return;
       }
       setReceipt({
-        trackingCode: json.data.trackingCode,
-        pageCount: json.data.pageCount,
+        trackingCode: parsed.data.trackingCode,
+        pageCount: parsed.data.pageCount,
       });
     } catch {
-      setSubmitError("Network error while uploading paper.");
+      setSubmitError("Unable to reach upload endpoint.");
     } finally {
       setSubmitting(false);
     }

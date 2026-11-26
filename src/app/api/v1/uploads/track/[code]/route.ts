@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { apiError, apiSuccess } from "@/lib/apiResponse";
+import { sanitizeConnectionError } from "@/lib/env";
 import { getDb } from "@/server/db/client";
 import { getStorageProvider } from "@/server/storage";
 import { UploadService } from "@/server/services/uploadService";
@@ -18,16 +19,20 @@ export async function GET(
     );
   }
 
-  const db = await getDb();
-  const service = new UploadService(db, getStorageProvider());
-  const tracked = await service.trackByCode(normalized);
-  if (!tracked) {
-    return apiError(
-      "NOT_FOUND",
-      "No submission matches that tracking code.",
-      404
-    );
-  }
+  try {
+    const db = await getDb();
+    const service = new UploadService(db, getStorageProvider());
+    const tracked = await service.trackByCode(normalized);
+    if (!tracked) {
+      return apiError(
+        "NOT_FOUND",
+        "No submission matches that tracking code.",
+        404
+      );
+    }
 
-  return apiSuccess(tracked);
+    return apiSuccess(tracked);
+  } catch (err) {
+    return apiError("TRACK_FAILED", sanitizeConnectionError(err), 500);
+  }
 }

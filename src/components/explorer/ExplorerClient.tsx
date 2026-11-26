@@ -22,6 +22,7 @@ import { FilterSidebar } from "@/components/explorer/FilterSidebar";
 import { PaperCard } from "@/components/explorer/PaperCard";
 import { FolderTree } from "@/components/explorer/FolderTree";
 import { PdfPreviewModal } from "@/components/pdf/PdfPreviewModal";
+import { safeReadApiJson } from "@/lib/httpClient";
 
 interface ExplorerClientProps {
   initialCatalog: FilterCatalogDto;
@@ -93,16 +94,19 @@ export function ExplorerClient({
       qs.set("limit", "40");
 
       const res = await fetch(`/api/v1/papers?${qs.toString()}`);
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        setErrorMsg(json.error?.message ?? "Unable to load question papers.");
+      const parsed = await safeReadApiJson<PaperDto[]>(
+        res,
+        "Unable to load question papers."
+      );
+      if (!parsed.ok || !parsed.data) {
+        setErrorMsg(parsed.errorMessage);
         return;
       }
-      setPapers(json.data);
-      setTotal(json.meta?.total ?? json.data.length);
+      setPapers(parsed.data);
+      setTotal(parsed.meta?.total ?? parsed.data.length);
       setSelectedIds([]);
     } catch {
-      setErrorMsg("Network error while loading question papers.");
+      setErrorMsg("Unable to reach archive API.");
     } finally {
       setLoading(false);
     }
@@ -124,9 +128,14 @@ export function ExplorerClient({
     setTreeLoading(true);
     try {
       const res = await fetch("/api/v1/papers/tree");
-      const json = await res.json();
-      if (res.ok && json.success) {
-        setTreeData(json.data);
+      const parsed = await safeReadApiJson<FolderTreeYearDto[]>(
+        res,
+        "Unable to load folder tree."
+      );
+      if (parsed.ok && parsed.data) {
+        setTreeData(parsed.data);
+      } else if (!parsed.ok) {
+        setErrorMsg(parsed.errorMessage);
       }
     } finally {
       setTreeLoading(false);

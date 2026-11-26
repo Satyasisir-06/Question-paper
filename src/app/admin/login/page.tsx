@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LockKey } from "@phosphor-icons/react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { safeReadApiJson } from "@/lib/httpClient";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -24,15 +25,15 @@ export default function AdminLoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        setErrorMsg(json.error?.message ?? "Invalid email or password.");
+      const parsed = await safeReadApiJson(res, "Invalid email or password.");
+      if (!parsed.ok) {
+        setErrorMsg(parsed.errorMessage);
         return;
       }
       router.push("/admin/queue");
       router.refresh();
     } catch {
-      setErrorMsg("Network error while signing in.");
+      setErrorMsg("Unable to reach sign-in endpoint. Check your connection and try again.");
     } finally {
       setLoading(false);
     }

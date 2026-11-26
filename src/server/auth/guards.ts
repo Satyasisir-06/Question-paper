@@ -6,7 +6,9 @@ import { getSessionUser, type SessionUser } from "./session";
 export function verifySameOrigin(request: NextRequest): boolean {
   const origin = request.headers.get("origin");
   if (!origin) return true; // Non-browser clients / curl without Origin
-  const host = request.headers.get("host");
+  const rawHost =
+    request.headers.get("x-forwarded-host") || request.headers.get("host");
+  const host = rawHost?.split(",")[0]?.trim();
   if (!host) return false;
   try {
     const parsedOrigin = new URL(origin);

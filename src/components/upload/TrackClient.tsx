@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { StatusBadge, ExamTypeBadge } from "@/components/ui/ExamBadge";
+import { safeReadApiJson } from "@/lib/httpClient";
 import {
   formatExamMonth,
   formatYearSemCode,
@@ -55,14 +56,17 @@ export function TrackClient({
       const res = await fetch(
         `/api/v1/uploads/track/${encodeURIComponent(clean)}`
       );
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        setErrorMsg(json.error?.message ?? "Submission not found.");
+      const parsed = await safeReadApiJson<TrackedSubmission>(
+        res,
+        "Submission not found."
+      );
+      if (!parsed.ok || !parsed.data) {
+        setErrorMsg(parsed.errorMessage);
         return;
       }
-      setResult(json.data);
+      setResult(parsed.data);
     } catch {
-      setErrorMsg("Network error while checking status.");
+      setErrorMsg("Unable to reach tracking endpoint.");
     } finally {
       setLoading(false);
     }

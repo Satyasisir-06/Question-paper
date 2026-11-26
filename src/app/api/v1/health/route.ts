@@ -49,7 +49,12 @@ export async function GET() {
     errorDetail = errorDetail ? `${errorDetail} | ${msg}` : msg;
   }
 
-  const ok = dbConnected && storageReady;
+  if (!envChecks.hasSessionSecret) {
+    const msg = "Auth: SESSION_SECRET must be set (minimum 32 characters).";
+    errorDetail = errorDetail ? `${errorDetail} | ${msg}` : msg;
+  }
+
+  const ok = dbConnected && storageReady && envChecks.hasSessionSecret;
   return NextResponse.json(
     {
       ok,

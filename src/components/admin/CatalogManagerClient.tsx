@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, UploadSimple } from "@phosphor-icons/react";
 import type { FilterCatalogDto } from "@/types/paper";
 import { getSemestersForYear, type ExamTypeValue } from "@/lib/btech";
+import { safeReadApiJson } from "@/lib/httpClient";
 
 interface AuditLogRow {
   id: string;
@@ -53,9 +54,12 @@ export function CatalogManagerClient({
 
   const refreshCatalog = async () => {
     const res = await fetch("/api/v1/admin/catalog");
-    const json = await res.json();
-    if (res.ok && json.success) {
-      setCatalog(json.data);
+    const parsed = await safeReadApiJson<FilterCatalogDto>(
+      res,
+      "Unable to refresh catalog."
+    );
+    if (parsed.ok && parsed.data) {
+      setCatalog(parsed.data);
     }
   };
 
@@ -71,14 +75,17 @@ export function CatalogManagerClient({
         data: { code: branchCode, name: branchName },
       }),
     });
-    const json = await res.json();
-    if (!res.ok || !json.success) {
-      setErrorMsg(json.error?.message ?? "Unable to create branch.");
+    const parsed = await safeReadApiJson<{ code: string }>(
+      res,
+      "Unable to create branch."
+    );
+    if (!parsed.ok || !parsed.data) {
+      setErrorMsg(parsed.errorMessage);
       return;
     }
     setBranchCode("");
     setBranchName("");
-    setStatusMsg(`Branch ${json.data.code} added`);
+    setStatusMsg(`Branch ${parsed.data.code} added`);
     await refreshCatalog();
   };
 
@@ -94,13 +101,16 @@ export function CatalogManagerClient({
         data: { csv: csvText },
       }),
     });
-    const json = await res.json();
-    if (!res.ok || !json.success) {
-      setErrorMsg(json.error?.message ?? "CSV import failed.");
+    const parsed = await safeReadApiJson<{ inserted: number; skipped: unknown[] }>(
+      res,
+      "CSV import failed."
+    );
+    if (!parsed.ok || !parsed.data) {
+      setErrorMsg(parsed.errorMessage);
       return;
     }
     setStatusMsg(
-      `Imported ${json.data.inserted} subjects (${json.data.skipped.length} skipped)`
+      `Imported ${parsed.data.inserted} subjects (${parsed.data.skipped.length} skipped)`
     );
     await refreshCatalog();
   };
@@ -129,13 +139,16 @@ export function CatalogManagerClient({
       method: "POST",
       body: fd,
     });
-    const json = await res.json();
-    if (!res.ok || !json.success) {
-      setErrorMsg(json.error?.message ?? "Direct publish failed.");
+    const parsed = await safeReadApiJson<{ trackingCode: string }>(
+      res,
+      "Direct publish failed."
+    );
+    if (!parsed.ok || !parsed.data) {
+      setErrorMsg(parsed.errorMessage);
       return;
     }
     setPubFile(null);
-    setStatusMsg(`Published ${json.data.trackingCode} directly to archive`);
+    setStatusMsg(`Published ${parsed.data.trackingCode} directly to archive`);
   };
 
   const validSems = getSemestersForYear(pubYear);

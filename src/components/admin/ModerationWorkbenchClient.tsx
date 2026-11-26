@@ -19,6 +19,7 @@ import {
 import { ExamTypeBadge, StatusBadge } from "@/components/ui/ExamBadge";
 import { PdfViewer } from "@/components/pdf/PdfViewer";
 import { scanPaperFileInBrowser } from "@/lib/browserPaperTools";
+import { safeReadApiJson } from "@/lib/httpClient";
 
 export interface AdminQueueItemDto {
   id: string;
@@ -162,9 +163,9 @@ function QueueInspector({
           setLabel: editSetLabel.trim() || null,
         }),
       });
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        onFeedback(json.error?.message ?? "Unable to approve submission.");
+      const parsed = await safeReadApiJson(res, "Unable to approve submission.");
+      if (!parsed.ok) {
+        onFeedback(parsed.errorMessage);
         return;
       }
       onFeedback(`Paper ${activeItem.trackingCode} approved and published`);
@@ -184,9 +185,9 @@ function QueueInspector({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reason: rejectReason }),
       });
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        onFeedback(json.error?.message ?? "Unable to reject submission.");
+      const parsed = await safeReadApiJson(res, "Unable to reject submission.");
+      if (!parsed.ok) {
+        onFeedback(parsed.errorMessage);
         return;
       }
       setRejectOpen(false);
@@ -547,14 +548,18 @@ export function ModerationWorkbenchClient({
     setLoading(true);
     try {
       const res = await fetch(`/api/v1/admin/papers?status=${tab}`);
-      const json = await res.json();
-      if (res.ok && json.success) {
-        setItems(json.data);
+      const parsed = await safeReadApiJson<AdminQueueItemDto[]>(
+        res,
+        "Unable to load moderation queue."
+      );
+      if (parsed.ok && parsed.data) {
+        const list = parsed.data;
+        setItems(list);
         setSelectedId((prev) =>
-          json.data.some((i: AdminQueueItemDto) => i.id === prev)
-            ? prev
-            : json.data[0]?.id ?? null
+          list.some((i) => i.id === prev) ? prev : list[0]?.id ?? null
         );
+      } else if (!parsed.ok) {
+        setFeedback(parsed.errorMessage);
       }
     } finally {
       setLoading(false);

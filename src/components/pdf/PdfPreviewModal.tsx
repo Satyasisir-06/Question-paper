@@ -18,6 +18,7 @@ import {
 } from "@/lib/btech";
 import { ExamTypeBadge } from "@/components/ui/ExamBadge";
 import { PdfViewer } from "@/components/pdf/PdfViewer";
+import { safeReadApiJson } from "@/lib/httpClient";
 
 interface PdfPreviewModalProps {
   paper: PaperDto | null;
@@ -81,10 +82,10 @@ function PdfPreviewDialogBody({
           details: reportDetails.trim() || undefined,
         }),
       });
-      const json = await res.json();
-      if (!res.ok || !json.success) {
+      const parsed = await safeReadApiJson(res, "Unable to submit report.");
+      if (!parsed.ok) {
         setReportStatus("error");
-        setReportMessage(json.error?.message ?? "Unable to submit report.");
+        setReportMessage(parsed.errorMessage);
         return;
       }
       setReportStatus("done");
@@ -92,7 +93,7 @@ function PdfPreviewDialogBody({
       setReportDetails("");
     } catch {
       setReportStatus("error");
-      setReportMessage("Network error while submitting report.");
+      setReportMessage("Unable to reach report endpoint.");
     }
   };
 
