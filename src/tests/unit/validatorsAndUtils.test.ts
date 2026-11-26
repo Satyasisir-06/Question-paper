@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Readable } from "node:stream";
 import { NextRequest } from "next/server";
 import {
@@ -163,6 +163,121 @@ describe("API helpers, schemas, and stream adapter", () => {
     } finally {
       if (prevKey === undefined) delete process.env.ADMIN_PORTAL_KEY;
       else process.env.ADMIN_PORTAL_KEY = prevKey;
+    }
+  });
+});
+
+describe("uploadFormWithProgress", () => {
+  it("reports upload progress and resolves ParsedApiResult on success", async () => {
+    const { uploadFormWithProgress } = await import("@/lib/httpClient");
+    const prevXhr = globalThis.XMLHttpRequest;
+
+    class MockXhr {
+      status = 200;
+      responseText = JSON.stringify({
+        success: true,
+        data: { trackingCode: "PV-TEST99" },
+      });
+      upload = {
+        onprogress: null as
+          | ((e: { lengthComputable: boolean; loaded: number; total: number }) => void)
+          | null,
+      };
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      onabort: (() => void) | null = null;
+      open = vi.fn();
+      send = vi.fn(() => {
+        this.upload.onprogress?.({
+          lengthComputable: true,
+          loaded: 50,
+          total: 100,
+        });
+        this.upload.onprogress?.({
+          lengthComputable: true,
+          loaded: 100,
+          total: 100,
+        });
+        this.onload?.();
+      });
+    }
+
+    vi.stubGlobal("XMLHttpRequest", MockXhr);
+    try {
+      const seen: number[] = [];
+      const form = new FormData();
+      form.append("test", "1");
+      const result = await uploadFormWithProgress<{ trackingCode: string }>(
+        "/api/submissions",
+        form,
+        "Upload failed",
+        (pct) => seen.push(pct)
+      );
+      expect(seen).toEqual([50, 100]);
+      expect(result.ok).toBe(true);
+      expect(result.data?.trackingCode).toBe("PV-TEST99");
+    } finally {
+      vi.stubGlobal("XMLHttpRequest", prevXhr);
+    }
+  });
+
+  it("handles server JSON errors, non-JSON 500 pages, network failures, and aborts", async () => {
+    const { uploadFormWithProgress } = await import("@/lib/httpClient");
+    const prevXhr = globalThis.XMLHttpRequest;
+
+    let scenario: "api_error" | "html_500" | "network" | "abort" = "api_error";
+    class ErrorXhr {
+      status = 400;
+      responseText = "";
+      upload = { onprogress: null };
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      onabort: (() => void) | null = null;
+      open = vi.fn();
+      send = vi.fn(() => {
+        if (scenario === "api_error") {
+          this.status = 422;
+          this.responseText = JSON.stringify({
+            success: false,
+            error: { message: "PDF rejected by validator" },
+          });
+          this.onload?.();
+        } else if (scenario === "html_500") {
+          this.status = 500;
+          this.responseText = "<html>Bad Gateway</html>";
+          this.onload?.();
+        } else if (scenario === "abort") {
+          this.onabort?.();
+        } else {
+          this.onerror?.();
+        }
+      });
+    }
+
+    vi.stubGlobal("XMLHttpRequest", ErrorXhr);
+    try {
+      const form = new FormData();
+      scenario = "api_error";
+      const apiErr = await uploadFormWithProgress("/api/submissions", form, "Fallback");
+      expect(apiErr.ok).toBe(false);
+      expect(apiErr.errorMessage).toBe("PDF rejected by validator");
+
+      scenario = "html_500";
+      const htmlErr = await uploadFormWithProgress("/api/submissions", form, "Fallback");
+      expect(htmlErr.ok).toBe(false);
+      expect(htmlErr.errorMessage).toMatch(/Fallback.*HTTP 500/);
+
+      scenario = "network";
+      await expect(
+        uploadFormWithProgress("/api/submissions", form, "Fallback")
+      ).rejects.toThrow(/Network error/i);
+
+      scenario = "abort";
+      await expect(
+        uploadFormWithProgress("/api/submissions", form, "Fallback")
+      ).rejects.toThrow(/cancelled/i);
+    } finally {
+      vi.stubGlobal("XMLHttpRequest", prevXhr);
     }
   });
 });

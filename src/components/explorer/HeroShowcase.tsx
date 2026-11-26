@@ -54,14 +54,14 @@ export function HeroShowcase({
   return (
     <section
       aria-label="Archive overview"
-      className="pt-2 pb-4 sm:pt-4 sm:pb-6 border-b border-[var(--border-primary)]"
+      className="pt-1 pb-6 sm:pt-4 sm:pb-8 border-b border-[var(--border-primary)]"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-10 items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
         <div className="lg:col-span-6 space-y-4 sm:space-y-5">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[var(--surface-raised)] border border-[var(--border-primary)] caption-4 text-[var(--text-secondary)]">
-            <Books size={14} weight="regular" aria-hidden="true" />
+          <p className="inline-flex items-center gap-2 caption-4 text-[var(--text-secondary)]">
+            <Books size={15} weight="regular" aria-hidden="true" />
             <span>Exam cell verified archive</span>
-          </div>
+          </p>
 
           <h1 className="heading-hero text-[var(--text-primary)]">
             B.Tech question paper archive
@@ -71,11 +71,11 @@ export function HeroShowcase({
             Find previous Regular and Supply exam booklets in seconds, inspect every page inline, or bundle a semester folder as ZIP.
           </p>
 
-          <div className="flex flex-wrap items-center gap-3 pt-1">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 pt-1">
             <button
               type="button"
               onClick={onJumpToArchive}
-              className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-lg button-md text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.98] transition-[background-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2"
+              className="inline-flex items-center justify-center gap-2 h-11 px-4 sm:px-5 rounded-lg button-md text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.98] transition-[background-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2"
             >
               <ArrowDown size={16} weight="regular" aria-hidden="true" />
               <span>Browse archive</span>
@@ -83,7 +83,7 @@ export function HeroShowcase({
 
             <Link
               href="/upload"
-              className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-lg button-md text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+              className="inline-flex items-center justify-center gap-2 h-11 px-4 sm:px-5 rounded-lg button-md text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
               style={{ border: "1px solid var(--border-primary)" }}
             >
               <UploadSimple size={16} weight="regular" aria-hidden="true" />
@@ -91,22 +91,22 @@ export function HeroShowcase({
             </Link>
           </div>
 
-          <dl className="pt-2 grid grid-cols-3 gap-4 max-w-md border-t border-[var(--border-primary)]">
+          <dl className="pt-3 grid grid-cols-3 gap-4 max-w-md border-t border-[var(--border-primary)]">
             <div>
               <dt className="caption-5 text-[var(--text-muted)]">Verified papers</dt>
-              <dd className="mt-0.5 text-xl sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
+              <dd className="mt-0.5 text-lg sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
                 {totalCatalogPapers}
               </dd>
             </div>
             <div>
               <dt className="caption-5 text-[var(--text-muted)]">Branches</dt>
-              <dd className="mt-0.5 text-xl sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
+              <dd className="mt-0.5 text-lg sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
                 {branchCount}
               </dd>
             </div>
             <div>
               <dt className="caption-5 text-[var(--text-muted)]">Subjects</dt>
-              <dd className="mt-0.5 text-xl sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
+              <dd className="mt-0.5 text-lg sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
                 {subjectCount}
               </dd>
             </div>
@@ -115,7 +115,7 @@ export function HeroShowcase({
 
         <div className="lg:col-span-6">
           <div
-            className="w-full h-[210px] sm:h-[260px] lg:h-[340px] rounded-2xl overflow-hidden"
+            className="w-full h-[188px] sm:h-[250px] lg:h-[340px] rounded-2xl overflow-hidden"
             style={{
               backgroundColor: "var(--surface-primary)",
               border: "1px solid var(--border-primary)",

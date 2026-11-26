@@ -28,14 +28,9 @@ export function YearSemMatrix({
   return (
     <section
       aria-label="Academic year, semester, and exam filters"
-      className="rounded-xl p-3 sm:p-4"
-      style={{
-        backgroundColor: "var(--surface-primary)",
-        border: "1px solid var(--border-primary)",
-        boxShadow: "var(--shadow-card)",
-      }}
+      className="pt-3 border-t border-[var(--border-primary)] sm:pt-4 sm:p-4 sm:rounded-xl sm:bg-[var(--surface-primary)] sm:border sm:border-[var(--border-primary)] sm:shadow-[var(--shadow-card)]"
     >
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5 sm:gap-3">
         <div className="space-y-1.5 min-w-0">
           <div className="flex items-center justify-between">
             <p className="caption-4 text-[var(--text-secondary)]">

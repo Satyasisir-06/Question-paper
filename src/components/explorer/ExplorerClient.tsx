@@ -286,7 +286,7 @@ export function ExplorerClient({
 
       <main
         id="main-content"
-        className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6"
+        className="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-4 md:px-6 py-5 sm:py-7 space-y-6 sm:space-y-8"
       >
         <HeroShowcase
           branchCount={initialCatalog.branches.length}
@@ -295,7 +295,10 @@ export function ExplorerClient({
           onJumpToArchive={handleJumpToArchive}
         />
 
-        <div id="archive-explorer" className="scroll-mt-20 space-y-3 sm:space-y-4">
+        <div
+          id="archive-explorer"
+          className="scroll-mt-20 rounded-2xl p-3.5 sm:p-0 bg-[var(--surface-primary)] sm:bg-transparent border border-[var(--border-primary)] sm:border-0 shadow-[var(--shadow-card)] sm:shadow-none space-y-3 sm:space-y-4"
+        >
           <div className="md:hidden relative">
             <MagnifyingGlass
               size={16}
@@ -308,7 +311,7 @@ export function ExplorerClient({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search subject code or name"
               aria-label="Search subject code or name"
-              className="w-full h-11 pl-10 pr-3 rounded-xl text-base sm:text-sm bg-[var(--surface-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+              className="w-full h-11 pl-10 pr-3 rounded-xl text-base sm:text-sm bg-[var(--surface-raised)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
               style={{ border: "1px solid var(--border-primary)" }}
             />
           </div>
@@ -324,7 +327,7 @@ export function ExplorerClient({
                 className={`shrink-0 h-8 px-3 rounded-lg caption-4 transition-colors duration-200 cursor-pointer ${
                   branch === ""
                     ? "bg-[#2563EB] text-white"
-                    : "bg-[var(--surface-primary)] text-[var(--text-secondary)] border border-[var(--border-primary)]"
+                    : "bg-[var(--surface-raised)] text-[var(--text-secondary)]"
                 }`}
               >
                 All branches
@@ -339,7 +342,7 @@ export function ExplorerClient({
                     className={`shrink-0 h-8 px-3 rounded-lg font-mono caption-4 transition-colors duration-200 cursor-pointer ${
                       active
                         ? "bg-[#2563EB] text-white"
-                        : "bg-[var(--surface-primary)] text-[var(--text-secondary)] border border-[var(--border-primary)]"
+                        : "bg-[var(--surface-raised)] text-[var(--text-secondary)]"
                     }`}
                   >
                     {br.code}
@@ -377,7 +380,7 @@ export function ExplorerClient({
             onReset={resetFilters}
           />
 
-          <div className="flex-1 min-w-0 space-y-3 sm:space-y-4">
+          <div className="flex-1 min-w-0 space-y-4">
             <div
               className="rounded-xl px-3.5 py-2.5 sm:px-4 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3"
               style={{
@@ -385,20 +388,20 @@ export function ExplorerClient({
                 border: "1px solid var(--border-primary)",
               }}
             >
-              <div className="flex items-center justify-between gap-2 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 min-w-0">
+              <div className="flex items-start sm:items-center justify-between gap-2.5 min-w-0">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 min-w-0">
                   <button
                     type="button"
                     onClick={() => setMobileFiltersOpen(true)}
-                    className="lg:hidden inline-flex items-center gap-1.5 h-9 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] shrink-0"
+                    className="lg:hidden inline-flex items-center gap-1.5 h-8 sm:h-9 px-2.5 sm:px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] shrink-0 cursor-pointer"
                     style={{ border: "1px solid var(--border-primary)" }}
                   >
-                    <Funnel size={15} weight="regular" />
+                    <Funnel size={14} weight="regular" />
                     <span>
                       Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
                     </span>
                   </button>
-                  <span className="font-mono caption-4 text-[var(--text-secondary)] truncate">
+                  <span className="font-mono caption-4 text-[var(--text-secondary)] truncate max-w-full">
                     {breadcrumbParts}
                   </span>
                   <span className="font-mono caption-5 text-[var(--text-muted)] tabular-nums shrink-0">
@@ -416,7 +419,7 @@ export function ExplorerClient({
                     type="button"
                     onClick={() => handleSwitchView("cards")}
                     aria-label="List view"
-                    className={`inline-flex items-center justify-center w-9 h-8 rounded-md cursor-pointer ${
+                    className={`inline-flex items-center justify-center w-8 h-7 rounded-md cursor-pointer ${
                       viewMode === "cards"
                         ? "bg-[var(--surface-primary)] text-[var(--text-primary)] shadow-xs"
                         : "text-[var(--text-secondary)]"
@@ -428,7 +431,7 @@ export function ExplorerClient({
                     type="button"
                     onClick={() => handleSwitchView("folders")}
                     aria-label="Folder view"
-                    className={`inline-flex items-center justify-center w-9 h-8 rounded-md cursor-pointer ${
+                    className={`inline-flex items-center justify-center w-8 h-7 rounded-md cursor-pointer ${
                       viewMode === "folders"
                         ? "bg-[var(--surface-primary)] text-[var(--text-primary)] shadow-xs"
                         : "text-[var(--text-secondary)]"
@@ -439,7 +442,11 @@ export function ExplorerClient({
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
+              <div
+                className={`flex flex-wrap items-center justify-end gap-2 ${
+                  viewMode === "cards" && total > 0 ? "flex" : "hidden sm:flex"
+                }`}
+              >
                 <div
                   role="group"
                   aria-label="Browse view mode"
@@ -475,6 +482,7 @@ export function ExplorerClient({
                 {viewMode === "cards" && total > 0 && (
                   <button
                     type="button"
+                    aria-label="Download folder (ZIP)"
                     disabled={zipDownloading}
                     onClick={() =>
                       triggerZipDownload({
@@ -489,12 +497,15 @@ export function ExplorerClient({
                         },
                       })
                     }
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-9 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] disabled:opacity-60 transition-[opacity,transform] duration-200 cursor-pointer"
+                    className="w-auto inline-flex items-center justify-center gap-1.5 h-8 sm:h-9 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] disabled:opacity-60 transition-[opacity,transform] duration-200 cursor-pointer"
                     style={{ border: "1px solid var(--border-primary)" }}
                   >
-                    <Package size={16} weight="regular" />
-                    <span>
+                    <Package size={15} weight="regular" />
+                    <span className="hidden sm:inline">
                       {zipDownloading ? "Packaging ZIP" : "Download folder (ZIP)"}
+                    </span>
+                    <span className="sm:hidden" aria-hidden="true">
+                      {zipDownloading ? "Packaging" : "Download ZIP"}
                     </span>
                   </button>
                 )}

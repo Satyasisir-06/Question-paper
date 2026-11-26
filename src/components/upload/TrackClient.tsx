@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { MagnifyingGlass } from "@phosphor-icons/react";
+import {
+  CheckCircle,
+  CircleNotch,
+  Clock,
+  MagnifyingGlass,
+  X,
+} from "@phosphor-icons/react";
 import { StatusBadge, ExamTypeBadge } from "@/components/ui/ExamBadge";
 import { safeReadApiJson } from "@/lib/httpClient";
 import {
@@ -79,29 +85,57 @@ export function TrackClient({
           e.preventDefault();
           void lookup(code);
         }}
-        className="rounded-2xl p-4 flex flex-col sm:flex-row gap-2"
+        className="rounded-2xl p-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 transition-[border-color,box-shadow] duration-200 focus-within:border-[#2563EB] focus-within:ring-2 focus-within:ring-[#2563EB]/20"
         style={{
           backgroundColor: "var(--surface-primary)",
           border: "1px solid var(--border-primary)",
           boxShadow: "var(--shadow-card)",
         }}
       >
-        <input
-          type="text"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          placeholder="Enter tracking code (e.g. PV-8F2A1C)"
-          aria-label="Submission tracking code"
-          className="flex-1 h-11 sm:h-10 px-3 rounded-lg font-mono text-base sm:text-sm bg-[var(--surface-raised)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
-          style={{ border: "1px solid var(--border-primary)" }}
-        />
+        <div className="relative flex-1 flex items-center min-w-0">
+          <MagnifyingGlass
+            size={18}
+            weight="regular"
+            className="absolute left-3.5 text-[var(--text-muted)] pointer-events-none shrink-0"
+          />
+          <input
+            type="text"
+            value={code}
+            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            placeholder="Code (e.g. PV-A1B2C3)"
+            aria-label="Submission tracking code"
+            autoCapitalize="characters"
+            autoCorrect="off"
+            spellCheck={false}
+            className="w-full h-11 sm:h-10 pl-10 pr-9 rounded-xl font-mono text-base sm:text-sm tracking-wide bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none"
+          />
+          {code.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setCode("");
+                setErrorMsg("");
+                setResult(null);
+              }}
+              aria-label="Clear tracking code"
+              className="absolute right-2 w-7 h-7 rounded-lg inline-flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-raised)] cursor-pointer"
+            >
+              <X size={14} weight="regular" />
+            </button>
+          )}
+        </div>
+
         <button
           type="submit"
-          disabled={loading}
-          className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-60 cursor-pointer"
+          disabled={loading || !code.trim()}
+          className="inline-flex items-center justify-center gap-2 h-11 sm:h-10 px-5 rounded-xl button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.98] disabled:opacity-60 transition-[background-color,transform] duration-200 cursor-pointer shrink-0"
         >
-          <MagnifyingGlass size={16} weight="regular" />
-          <span>{loading ? "Checking" : "Check status"}</span>
+          {loading ? (
+            <CircleNotch size={16} className="animate-spin" />
+          ) : (
+            <MagnifyingGlass size={16} weight="regular" />
+          )}
+          <span>{loading ? "Checking..." : "Check status"}</span>
         </button>
       </form>
 
@@ -119,9 +153,32 @@ export function TrackClient({
         </div>
       )}
 
+      {!result && !errorMsg && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div className="rounded-xl p-4 bg-[var(--surface-primary)] border border-[var(--border-primary)] space-y-1">
+            <div className="flex items-center gap-2 text-[var(--text-primary)] title-4">
+              <Clock size={16} weight="regular" className="text-[#a16207]" />
+              <span>Pending review</span>
+            </div>
+            <p className="caption-5 text-[var(--text-secondary)]">
+              Uploads remain private until an exam admin verifies the PDF pages.
+            </p>
+          </div>
+          <div className="rounded-xl p-4 bg-[var(--surface-primary)] border border-[var(--border-primary)] space-y-1">
+            <div className="flex items-center gap-2 text-[var(--text-primary)] title-4">
+              <CheckCircle size={16} weight="regular" className="text-[#16a34a]" />
+              <span>Published</span>
+            </div>
+            <p className="caption-5 text-[var(--text-secondary)]">
+              Once approved, the paper goes live with a shareable archive link.
+            </p>
+          </div>
+        </div>
+      )}
+
       {result && (
         <div
-          className="rounded-2xl p-6 space-y-4"
+          className="rounded-2xl p-5 sm:p-6 space-y-4"
           style={{
             backgroundColor: "var(--surface-primary)",
             border: "1px solid var(--border-primary)",
@@ -135,7 +192,7 @@ export function TrackClient({
             <StatusBadge status={result.status} />
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-mono caption-4 px-2 py-0.5 rounded bg-[var(--surface-raised)]">
                 {result.subjectCode}
@@ -183,7 +240,7 @@ export function TrackClient({
             <div className="pt-1">
               <Link
                 href={`/papers/${result.paperId}`}
-                className="inline-flex items-center h-9 px-3 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8]"
+                className="inline-flex items-center h-10 px-4 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8]"
               >
                 View published question paper
               </Link>

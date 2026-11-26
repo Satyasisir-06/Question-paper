@@ -277,4 +277,62 @@ describe("browserPaperTools (photo-to-PDF conversion & local PDF/OCR scanning)",
     expect(mockTerminate).toHaveBeenCalledTimes(1);
     expect(mockDestroy).toHaveBeenCalledTimes(1);
   });
+
+  it("recognizes .heic/.heif mobile images, clones bytes into memory, and recovers from createImageBitmap orientation errors", async () => {
+    const { cloneFileIntoMemory } = await import("@/lib/browserPaperTools");
+
+    expect(isImageFile(new File(["h"], "camera.HEIC", { type: "" }))).toBe(true);
+    expect(isImageFile(new File(["h"], "camera.heif", { type: "" }))).toBe(true);
+
+    const original = new File(["hello-bytes"], "", { type: "" });
+    const cloned = await cloneFileIntoMemory(
+      original,
+      "camera-fallback.jpg",
+      "image/jpeg"
+    );
+    expect(cloned.name).toBe("camera-fallback.jpg");
+    expect(cloned.type).toBe("image/jpeg");
+    expect(await cloned.text()).toBe("hello-bytes");
+
+    installMockCanvasEnvironment();
+    const bitmapMock = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("InvalidStateError: orientation unsupported"))
+      .mockResolvedValueOnce({ width: 1200, height: 1600, close: vi.fn() });
+    vi.stubGlobal("createImageBitmap", bitmapMock);
+
+    const firstOut = await convertImagesToPdf([
+      new File(["x"], "first-snap.jpg", { type: "image/jpeg" }),
+    ]);
+    expect(firstOut.pageCount).toBe(1);
+    expect(bitmapMock).toHaveBeenCalledTimes(2);
+
+    vi.stubGlobal(
+      "createImageBitmap",
+      vi.fn().mockRejectedValue(new Error("decode failed"))
+    );
+    const revokeSpy = vi.fn();
+    vi.stubGlobal("URL", {
+      createObjectURL: vi.fn(() => "blob:camera-fallback"),
+      revokeObjectURL: revokeSpy,
+    });
+    class FallbackImage {
+      naturalWidth = 900;
+      naturalHeight = 1200;
+      width = 900;
+      height = 1200;
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      set src(_val: string) {
+        queueMicrotask(() => this.onload?.());
+      }
+    }
+    vi.stubGlobal("Image", FallbackImage);
+
+    const secondOut = await convertImagesToPdf([
+      new File(["y"], "second-snap.jpg", { type: "image/jpeg" }),
+    ]);
+    expect(secondOut.pageCount).toBe(1);
+    expect(revokeSpy).toHaveBeenCalledWith("blob:camera-fallback");
+  });
 });

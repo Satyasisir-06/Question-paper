@@ -8,7 +8,7 @@ import {
   type ScannedPaperMetadata,
 } from "@/lib/paperScanner";
 
-const IMAGE_EXTENSIONS = /\.(?:jpg|jpeg|png|webp|bmp)$/i;
+const IMAGE_EXTENSIONS = /\.(?:jpg|jpeg|png|webp|bmp|heic|heif|avif)$/i;
 const PDF_EXTENSION = /\.pdf$/i;
 
 export interface PaperScanOutcome {
@@ -27,37 +27,78 @@ export function isPdfFile(file: File): boolean {
   return file.type === "application/pdf" || PDF_EXTENSION.test(file.name);
 }
 
+/** Snapshot a browser File into fresh in-memory bytes before mobile input resets. */
+export async function cloneFileIntoMemory(
+  file: File,
+  fallbackName: string,
+  fallbackType: string
+): Promise<File> {
+  const bytes = await file.arrayBuffer();
+  return new File([bytes], file.name || fallbackName, {
+    type: file.type || fallbackType,
+    lastModified: file.lastModified || Date.now(),
+  });
+}
+
+async function decodeImageSource(file: File): Promise<{
+  width: number;
+  height: number;
+  drawSource: CanvasImageSource;
+  cleanup: () => void;
+}> {
+  if (typeof createImageBitmap === "function") {
+    try {
+      const bitmap = await createImageBitmap(file, {
+        imageOrientation: "from-image",
+      });
+      return {
+        width: bitmap.width,
+        height: bitmap.height,
+        drawSource: bitmap,
+        cleanup: () => bitmap.close(),
+      };
+    } catch {
+      try {
+        const bitmap = await createImageBitmap(file);
+        return {
+          width: bitmap.width,
+          height: bitmap.height,
+          drawSource: bitmap,
+          cleanup: () => bitmap.close(),
+        };
+      } catch {
+        // Fall through to HTMLImageElement decode for mobile camera formats
+      }
+    }
+  }
+
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("Unable to decode image file."));
+      el.src = objectUrl;
+    });
+    return {
+      width: img.naturalWidth || img.width,
+      height: img.naturalHeight || img.height,
+      drawSource: img,
+      cleanup: () => URL.revokeObjectURL(objectUrl),
+    };
+  } catch (err) {
+    URL.revokeObjectURL(objectUrl);
+    throw err;
+  }
+}
+
 async function renderImageToCanvas(
   file: File,
   maxWidth = 1800
 ): Promise<HTMLCanvasElement> {
-  let width = 0;
-  let height = 0;
-  let drawSource: CanvasImageSource | null = null;
-  let objectUrl: string | null = null;
-  let bitmap: ImageBitmap | null = null;
-
+  const decoded = await decodeImageSource(file);
   try {
-    if (typeof createImageBitmap === "function") {
-      bitmap = await createImageBitmap(file, {
-        imageOrientation: "from-image",
-      });
-      width = bitmap.width;
-      height = bitmap.height;
-      drawSource = bitmap;
-    } else {
-      objectUrl = URL.createObjectURL(file);
-      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const el = new Image();
-        el.onload = () => resolve(el);
-        el.onerror = () => reject(new Error("Unable to decode image file."));
-        el.src = objectUrl!;
-      });
-      width = img.naturalWidth || img.width;
-      height = img.naturalHeight || img.height;
-      drawSource = img;
-    }
-
+    const { width, height, drawSource } = decoded;
     if (!drawSource || width <= 0 || height <= 0) {
       throw new Error("Selected photo has invalid dimensions.");
     }
@@ -79,10 +120,7 @@ async function renderImageToCanvas(
     ctx.drawImage(drawSource, 0, 0, targetWidth, targetHeight);
     return canvas;
   } finally {
-    bitmap?.close();
-    if (objectUrl) {
-      URL.revokeObjectURL(objectUrl);
-    }
+    decoded.cleanup();
   }
 }
 
