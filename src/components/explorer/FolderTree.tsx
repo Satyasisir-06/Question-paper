@@ -56,24 +56,24 @@ export function FolderTree({
               border: "1px solid var(--border-primary)",
             }}
           >
-            <div className="px-4 py-3 flex items-center justify-between gap-3">
+            <div className="px-3.5 sm:px-4 py-3 flex items-center justify-between gap-2.5">
               <button
                 type="button"
                 onClick={() => toggleYear(yearNode.yearOfStudy)}
-                className="flex items-center gap-2 text-left text-[var(--text-primary)] cursor-pointer"
+                className="flex items-center gap-2 text-left text-[var(--text-primary)] cursor-pointer min-w-0"
               >
                 {isYearOpen ? (
-                  <CaretDown size={16} weight="regular" />
+                  <CaretDown size={16} weight="regular" className="shrink-0" />
                 ) : (
-                  <CaretRight size={16} weight="regular" />
+                  <CaretRight size={16} weight="regular" className="shrink-0" />
                 )}
                 {isYearOpen ? (
-                  <FolderOpen size={18} weight="regular" className="text-[#2563EB]" />
+                  <FolderOpen size={18} weight="regular" className="text-[var(--action-primary)] shrink-0" />
                 ) : (
-                  <Folder size={18} weight="regular" className="text-[var(--text-muted)]" />
+                  <Folder size={18} weight="regular" className="text-[var(--text-muted)] shrink-0" />
                 )}
-                <span className="title-3">{yearNode.label}</span>
-                <span className="font-mono caption-5 text-[var(--text-muted)] tabular-nums">
+                <span className="title-3 truncate">{yearNode.label}</span>
+                <span className="font-mono caption-5 text-[var(--text-muted)] tabular-nums shrink-0">
                   {yearNode.paperCount} papers
                 </span>
               </button>
@@ -84,41 +84,42 @@ export function FolderTree({
                   onClick={() =>
                     onDownloadFolderZip({ year: yearNode.yearOfStudy })
                   }
-                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg caption-4 text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 h-9 sm:h-8 px-2.5 rounded-lg caption-4 text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 shrink-0 cursor-pointer"
                   style={{ border: "1px solid var(--border-primary)" }}
                 >
                   <DownloadSimple size={14} weight="regular" />
-                  <span>ZIP folder</span>
+                  <span className="hidden xs:inline">ZIP folder</span>
+                  <span className="xs:hidden">ZIP</span>
                 </button>
               )}
             </div>
 
             {isYearOpen && (
-              <div className="px-4 pb-3 space-y-2">
+              <div className="px-3 sm:px-4 pb-3 space-y-2.5">
                 {yearNode.semesters.map((semNode) => {
                   const isSemOpen = Boolean(openSems[semNode.semester]);
                   return (
                     <div
                       key={semNode.semester}
-                      className="rounded-lg p-3 bg-[var(--surface-raised)]"
+                      className="rounded-xl p-2.5 sm:p-3 bg-[var(--surface-raised)]/75"
                       style={{ border: "1px solid var(--border-primary)" }}
                     >
-                      <div className="flex items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
                         <button
                           type="button"
                           onClick={() => toggleSem(semNode.semester)}
-                          className="flex items-center gap-2 text-left text-[var(--text-primary)] cursor-pointer"
+                          className="flex items-center gap-2 text-left text-[var(--text-primary)] cursor-pointer min-w-0"
                         >
                           {isSemOpen ? (
-                            <CaretDown size={14} weight="regular" />
+                            <CaretDown size={14} weight="regular" className="shrink-0" />
                           ) : (
-                            <CaretRight size={14} weight="regular" />
+                            <CaretRight size={14} weight="regular" className="shrink-0" />
                           )}
-                          <span className="font-mono caption-4 px-1.5 py-0.5 rounded bg-[var(--surface-primary)]">
+                          <span className="font-mono caption-4 px-1.5 py-0.5 rounded bg-[var(--surface-primary)] shrink-0">
                             {semNode.code}
                           </span>
-                          <span className="title-4">{semNode.label}</span>
-                          <span className="font-mono caption-5 text-[var(--text-muted)] tabular-nums">
+                          <span className="title-4 truncate">{semNode.label}</span>
+                          <span className="font-mono caption-5 text-[var(--text-muted)] tabular-nums shrink-0">
                             {semNode.paperCount}
                           </span>
                         </button>
@@ -132,7 +133,7 @@ export function FolderTree({
                                 sem: semNode.semester,
                               })
                             }
-                            className="inline-flex items-center gap-1 h-7 px-2 rounded-md caption-4 text-[#2563EB] hover:bg-[var(--surface-primary)] cursor-pointer"
+                            className="inline-flex items-center gap-1 h-8 sm:h-7 px-2 rounded-md caption-4 text-[var(--action-primary)] hover:bg-[var(--surface-primary)] cursor-pointer"
                           >
                             <DownloadSimple size={14} weight="regular" />
                             <span>Download sem ZIP</span>
@@ -141,19 +142,19 @@ export function FolderTree({
                       </div>
 
                       {isSemOpen && (
-                        <div className="mt-3 space-y-2">
+                        <div className="mt-2.5 pl-2.5 sm:pl-3 border-l border-[var(--border-strong)] space-y-2">
                           {semNode.branches.length === 0 ? (
-                            <p className="caption-5 text-[var(--text-muted)] pl-6">
+                            <p className="caption-5 text-[var(--text-muted)] py-1">
                               No approved papers in this semester yet
                             </p>
                           ) : (
                             semNode.branches.map((br) => (
                               <div
                                 key={br.branchCode}
-                                className="rounded-lg p-3 bg-[var(--surface-primary)] space-y-2"
+                                className="rounded-xl p-2.5 sm:p-3 bg-[var(--surface-primary)] space-y-2"
                                 style={{ border: "1px solid var(--border-primary)" }}
                               >
-                                <div className="flex items-center justify-between gap-2">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
                                   <div className="flex items-center gap-2">
                                     <span className="font-mono caption-4 text-[var(--text-primary)]">
                                       {br.branchCode}
@@ -171,28 +172,28 @@ export function FolderTree({
                                         branch: br.branchCode,
                                       })
                                     }
-                                    className="caption-4 text-[#2563EB] hover:underline cursor-pointer"
+                                    className="caption-4 text-[var(--action-primary)] hover:underline cursor-pointer"
                                   >
                                     Download {br.branchCode} ZIP
                                   </button>
                                 </div>
 
-                                <div className="space-y-1">
+                                <div className="divide-y divide-[var(--border-primary)]">
                                   {br.papers.map((p) => (
                                     <div
                                       key={p.id}
-                                      className="py-1.5 px-2 rounded-md flex flex-wrap items-center justify-between gap-2 hover:bg-[var(--surface-raised)]"
+                                      className="py-2 px-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
                                     >
-                                      <div className="flex items-center gap-2 min-w-0">
+                                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">
                                         <FilePdf
-                                          size={16}
+                                          size={15}
                                           weight="regular"
                                           className="text-[var(--text-muted)] shrink-0"
                                         />
                                         <span className="font-mono caption-4 text-[var(--text-primary)]">
                                           {p.subjectCode}
                                         </span>
-                                        <span className="body-6 text-[var(--text-primary)] truncate">
+                                        <span className="body-6 text-[var(--text-primary)] truncate max-w-[200px] sm:max-w-xs">
                                           {p.subjectName}
                                         </span>
                                         <ExamTypeBadge examType={p.examType} />
@@ -201,18 +202,18 @@ export function FolderTree({
                                         </span>
                                       </div>
 
-                                      <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-2 shrink-0">
                                         <button
                                           type="button"
                                           onClick={() => onPreview(p)}
-                                          className="inline-flex items-center gap-1 h-7 px-2 rounded caption-4 text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer"
+                                          className="inline-flex items-center gap-1 h-8 sm:h-7 px-2.5 rounded-lg caption-4 text-[var(--text-primary)] bg-[var(--surface-raised)] cursor-pointer"
                                         >
                                           <Eye size={14} weight="regular" />
                                           <span>View</span>
                                         </button>
                                         <a
                                           href={`/api/v1/papers/${p.id}/download`}
-                                          className="inline-flex items-center gap-1 h-7 px-2 rounded caption-4 text-[#2563EB] hover:underline"
+                                          className="inline-flex items-center gap-1 h-8 sm:h-7 px-2.5 rounded-lg caption-4 text-[var(--action-primary)] bg-[var(--surface-raised)] hover:underline"
                                         >
                                           <DownloadSimple size={14} weight="regular" />
                                           <span>PDF</span>

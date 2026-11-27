@@ -91,6 +91,7 @@ function QueueInspector({
 
   const [rejectOpen, setRejectOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState<string>(PRESET_REASONS[0]);
+  const [mobilePane, setMobilePane] = useState<"split" | "meta" | "pdf">("split");
   const [scanningPdf, setScanningPdf] = useState(false);
   const [scanSummary, setScanSummary] = useState("");
 
@@ -226,12 +227,47 @@ function QueueInspector({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+    <div className="space-y-3 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-start">
       <div
-        className="lg:col-span-8 rounded-2xl p-3 h-[72dvh] lg:h-[80vh] min-h-[480px] flex flex-col gap-2"
+        role="group"
+        aria-label="Mobile workspace view"
+        className="lg:hidden grid grid-cols-3 p-1 rounded-xl bg-[var(--surface-raised)]"
+        style={{ border: "1px solid var(--border-primary)" }}
+      >
+        {(
+          [
+            { id: "split", label: "Split view" },
+            { id: "meta", label: "Edit details" },
+            { id: "pdf", label: "Full PDF" },
+          ] as const
+        ).map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setMobilePane(tab.id)}
+            className={`h-9 rounded-lg caption-4 transition-colors cursor-pointer ${
+              mobilePane === tab.id
+                ? "bg-[var(--surface-primary)] text-[var(--text-primary)] shadow-xs"
+                : "text-[var(--text-secondary)]"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <div
+        className={`${
+          mobilePane === "meta" ? "hidden lg:flex" : "flex"
+        } lg:col-span-8 rounded-2xl p-3 flex-col gap-2 ${
+          mobilePane === "pdf"
+            ? "h-[68dvh] min-h-[440px]"
+            : "h-[38dvh] min-h-[260px] lg:h-[80vh] lg:min-h-[480px]"
+        }`}
         style={{
           backgroundColor: "var(--surface-primary)",
           border: "1px solid var(--border-primary)",
+          boxShadow: "var(--shadow-card)",
         }}
       >
         <div className="flex flex-wrap items-center justify-between gap-2 px-1">
@@ -256,10 +292,13 @@ function QueueInspector({
       </div>
 
       <div
-        className="lg:col-span-4 rounded-2xl p-4 sm:p-5 space-y-4"
+        className={`${
+          mobilePane === "pdf" ? "hidden lg:block" : "block"
+        } lg:col-span-4 rounded-2xl p-4 sm:p-5 space-y-4`}
         style={{
           backgroundColor: "var(--surface-primary)",
           border: "1px solid var(--border-primary)",
+          boxShadow: "var(--shadow-card)",
         }}
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -272,7 +311,7 @@ function QueueInspector({
             type="button"
             disabled={scanningPdf}
             onClick={() => void handleAutoScan()}
-            className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg caption-4 text-[#2563EB] bg-[var(--surface-raised)] hover:opacity-90 disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center gap-1.5 h-9 sm:h-8 px-3 sm:px-2.5 rounded-xl sm:rounded-lg caption-4 text-[var(--action-primary)] bg-[var(--surface-raised)] hover:opacity-90 disabled:opacity-60 cursor-pointer"
             style={{ border: "1px solid var(--border-primary)" }}
           >
             <MagicWand size={14} weight="regular" />
@@ -694,8 +733,11 @@ export function ModerationWorkbenchClient({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="space-y-1">
+          <p className="font-mono text-[11px] text-[var(--text-muted)]">
+            REVIEW &amp; METADATA DESK
+          </p>
           <h1 className="heading-4 text-[var(--text-primary)]">
             Moderation workbench
           </h1>
@@ -708,7 +750,7 @@ export function ModerationWorkbenchClient({
         <div
           role="tablist"
           aria-label="Submission status tabs"
-          className="inline-flex p-1 rounded-lg bg-[var(--surface-raised)]"
+          className="grid grid-cols-3 sm:inline-flex p-1 rounded-xl bg-[var(--surface-raised)]"
           style={{ border: "1px solid var(--border-primary)" }}
         >
           {(["PENDING", "APPROVED", "REJECTED"] as const).map((tab) => (
@@ -718,7 +760,7 @@ export function ModerationWorkbenchClient({
               role="tab"
               aria-selected={statusTab === tab}
               onClick={() => handleTabSwitch(tab)}
-              className={`h-9 sm:h-8 px-3 rounded-md caption-4 cursor-pointer ${
+              className={`h-10 sm:h-8 px-3 rounded-lg sm:rounded-md caption-4 whitespace-nowrap cursor-pointer ${
                 statusTab === tab
                   ? "bg-[var(--surface-primary)] text-[var(--text-primary)] shadow-xs"
                   : "text-[var(--text-secondary)]"

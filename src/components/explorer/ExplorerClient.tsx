@@ -281,7 +281,7 @@ export function ExplorerClient({
 
       <main
         id="main-content"
-        className="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-4 md:px-6 py-5 sm:py-7 space-y-6 sm:space-y-8"
+        className="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-4 md:px-6 pt-4 sm:pt-7 pb-6 space-y-6 sm:space-y-8"
       >
         <HeroShowcase
           branchCount={initialCatalog.branches.length}
@@ -306,7 +306,7 @@ export function ExplorerClient({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search subject code or name"
               aria-label="Search subject code or name"
-              className="w-full h-11 pl-10 pr-3 rounded-xl text-base sm:text-sm bg-[var(--surface-raised)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+              className="w-full h-11 pl-10 pr-3 rounded-xl text-base sm:text-sm bg-[var(--surface-raised)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
               style={{ border: "1px solid var(--border-primary)" }}
             />
           </div>
@@ -319,9 +319,9 @@ export function ExplorerClient({
               <button
                 type="button"
                 onClick={() => setBranch("")}
-                className={`shrink-0 h-8 px-3 rounded-lg caption-4 transition-colors duration-200 cursor-pointer ${
+                className={`shrink-0 h-9 px-3 rounded-xl caption-4 transition-colors duration-200 cursor-pointer ${
                   branch === ""
-                    ? "bg-[#2563EB] text-white"
+                    ? "bg-[var(--action-primary)] text-white"
                     : "bg-[var(--surface-raised)] text-[var(--text-secondary)]"
                 }`}
               >
@@ -334,9 +334,9 @@ export function ExplorerClient({
                     key={br.id}
                     type="button"
                     onClick={() => setBranch(active ? "" : br.code)}
-                    className={`shrink-0 h-8 px-3 rounded-lg font-mono caption-4 transition-colors duration-200 cursor-pointer ${
+                    className={`shrink-0 h-9 px-3 rounded-xl font-mono caption-4 transition-colors duration-200 cursor-pointer ${
                       active
-                        ? "bg-[#2563EB] text-white"
+                        ? "bg-[var(--action-primary)] text-white"
                         : "bg-[var(--surface-raised)] text-[var(--text-secondary)]"
                     }`}
                   >
@@ -523,10 +523,10 @@ export function ExplorerClient({
 
             {selectedIds.length > 0 && viewMode === "cards" && (
               <div
-                className="fixed bottom-3 inset-x-3 z-30 sm:static rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3"
+                className="fixed bottom-20 md:bottom-4 inset-x-3 z-20 sm:static rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3 backdrop-blur-md"
                 style={{
-                  backgroundColor: "var(--surface-primary)",
-                  border: "1px solid #2563EB",
+                  backgroundColor: "color-mix(in srgb, var(--surface-primary) 94%, transparent)",
+                  border: "1.5px solid var(--action-primary)",
                   boxShadow: "var(--shadow-float)",
                 }}
               >
@@ -545,7 +545,7 @@ export function ExplorerClient({
                     type="button"
                     disabled={zipDownloading}
                     onClick={() => triggerZipDownload({ paperIds: selectedIds })}
-                    className="inline-flex items-center gap-2 h-9 sm:h-8 px-3 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] cursor-pointer"
+                    className="inline-flex items-center gap-2 h-9 sm:h-8 px-3 rounded-lg button-sm text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] cursor-pointer"
                   >
                     <Package size={15} weight="regular" />
                     <span>Download ZIP</span>
@@ -646,8 +646,8 @@ export function ExplorerClient({
         </div>
       </main>
 
-      <footer className="border-t border-[var(--border-primary)] bg-[var(--surface-primary)] mt-8">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <footer className="border-t border-[var(--border-primary)] bg-[var(--surface-primary)] mt-8 pb-24 md:pb-6">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="space-y-0.5">
             <p className="title-4 text-[var(--text-primary)]">B.Tech PaperVault</p>
             <p className="caption-5 text-[var(--text-muted)]">
@@ -658,7 +658,7 @@ export function ExplorerClient({
             <Link href="/track" className="hover:text-[var(--text-primary)]">
               Track upload
             </Link>
-            <Link href="/upload" className="text-[#2563EB] hover:underline">
+            <Link href="/upload" className="text-[var(--action-primary)] hover:underline">
               Upload paper
             </Link>
           </nav>

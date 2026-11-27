@@ -108,7 +108,7 @@ function PdfPreviewDialogBody({
       }}
     >
       <div
-        className="w-full max-w-5xl h-[100dvh] sm:h-[92vh] rounded-none sm:rounded-2xl p-3 sm:p-4 flex flex-col gap-2.5 sm:gap-3 transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        className="w-full max-w-5xl h-[100dvh] sm:h-[92vh] rounded-none sm:rounded-[1.5rem] p-3.5 sm:p-4 pb-[calc(0.875rem+env(safe-area-inset-bottom))] flex flex-col gap-2.5 sm:gap-3 transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
         style={{
           backgroundColor: "var(--surface-primary)",
           border: "1px solid var(--border-primary)",
@@ -119,7 +119,7 @@ function PdfPreviewDialogBody({
           <div className="flex items-start justify-between gap-2 min-w-0">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <span className="font-mono caption-4 px-2 py-0.5 rounded bg-[var(--surface-raised)] text-[var(--text-primary)]">
+                <span className="font-mono caption-4 px-2 py-0.5 rounded-md bg-[var(--surface-raised)] text-[var(--text-primary)]">
                   {paper.subjectCode}
                 </span>
                 <span className="font-mono caption-4 text-[var(--text-muted)]">
@@ -139,7 +139,7 @@ function PdfPreviewDialogBody({
               type="button"
               onClick={onClose}
               aria-label="Close preview"
-              className="sm:hidden inline-flex items-center justify-center w-10 h-10 shrink-0 rounded-lg text-[var(--text-secondary)] bg-[var(--surface-raised)]"
+              className="sm:hidden inline-flex items-center justify-center w-10 h-10 shrink-0 rounded-full text-[var(--text-secondary)] bg-[var(--surface-raised)]"
             >
               <X size={18} weight="regular" />
             </button>
@@ -149,7 +149,7 @@ function PdfPreviewDialogBody({
             <button
               type="button"
               onClick={handleCopyLink}
-              className="inline-flex items-center gap-1.5 h-10 sm:h-9 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] transition-[opacity,transform] duration-200 cursor-pointer"
+              className="inline-flex items-center gap-1.5 h-10 sm:h-9 px-3 rounded-xl sm:rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] transition-[opacity,transform] duration-200 cursor-pointer"
               style={{ border: "1px solid var(--border-primary)" }}
             >
               {copied ? (
@@ -163,7 +163,7 @@ function PdfPreviewDialogBody({
             <button
               type="button"
               onClick={() => setReportOpen((prev) => !prev)}
-              className="inline-flex items-center gap-1.5 h-10 sm:h-9 px-3 rounded-lg button-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-raised)] active:scale-[0.98] transition-[color,transform] duration-200 cursor-pointer"
+              className="inline-flex items-center gap-1.5 h-10 sm:h-9 px-3 rounded-xl sm:rounded-lg button-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-raised)] active:scale-[0.98] transition-[color,transform] duration-200 cursor-pointer"
               style={{ border: "1px solid var(--border-primary)" }}
             >
               <Flag size={16} weight="regular" />
@@ -181,7 +181,7 @@ function PdfPreviewDialogBody({
 
             <a
               href={`/api/v1/papers/${paper.id}/download`}
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 h-10 sm:h-9 px-3 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.98] transition-[background-color,transform] duration-200"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 h-10 sm:h-9 px-3.5 rounded-xl sm:rounded-lg button-sm text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] active:scale-[0.98] transition-[background-color,transform] duration-200"
             >
               <DownloadSimple size={16} weight="regular" />
               <span>Download PDF</span>

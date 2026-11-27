@@ -73,9 +73,12 @@ export default function UploadPage({
       <SiteHeader />
       <main
         id="main-content"
-        className="flex-1 max-w-4xl w-full mx-auto px-4 md:px-6 py-8 space-y-6"
+        className="flex-1 max-w-4xl w-full mx-auto px-3.5 sm:px-4 md:px-6 pt-5 sm:pt-8 pb-28 md:pb-10 space-y-6"
       >
-        <div className="max-w-[680px] mx-auto space-y-1">
+        <div className="max-w-2xl mx-auto space-y-1.5">
+          <p className="font-mono caption-4 text-[var(--text-muted)]">
+            STUDENT CONTRIBUTION DESK
+          </p>
           <h1 className="heading-4 text-[var(--text-primary)]">
             Upload a question paper
           </h1>

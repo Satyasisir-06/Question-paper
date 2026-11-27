@@ -54,7 +54,7 @@ export function HeroShowcase({
   return (
     <section
       aria-label="Archive overview"
-      className="pt-1 pb-6 sm:pt-4 sm:pb-8 border-b border-[var(--border-primary)]"
+      className="pt-1 pb-6 sm:pt-4 sm:pb-9 border-b border-[var(--border-primary)]"
     >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
         <div className="lg:col-span-6 space-y-4 sm:space-y-5">
@@ -67,7 +67,7 @@ export function HeroShowcase({
             B.Tech question paper archive
           </h1>
 
-          <p className="body-5 text-[var(--text-secondary)] max-w-[54ch]">
+          <p className="body-5 text-[var(--text-secondary)] max-w-[52ch]">
             Find previous Regular and Supply exam booklets in seconds, inspect every page inline, or bundle a semester folder as ZIP.
           </p>
 
@@ -75,38 +75,51 @@ export function HeroShowcase({
             <button
               type="button"
               onClick={onJumpToArchive}
-              className="inline-flex items-center justify-center gap-2 h-11 px-4 sm:px-5 rounded-lg button-md text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.98] transition-[background-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2"
+              className="group inline-flex items-center justify-between sm:justify-center gap-2.5 h-12 sm:h-11 pl-4 pr-2 sm:px-5 rounded-full button-md text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] active:scale-[0.98] transition-[background-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] focus-visible:ring-offset-2"
             >
-              <ArrowDown size={16} weight="regular" aria-hidden="true" />
               <span>Browse archive</span>
+              <span
+                className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:translate-y-0.5"
+                aria-hidden="true"
+              >
+                <ArrowDown size={15} weight="regular" />
+              </span>
             </button>
 
             <Link
               href="/upload"
-              className="inline-flex items-center justify-center gap-2 h-11 px-4 sm:px-5 rounded-lg button-md text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
-              style={{ border: "1px solid var(--border-primary)" }}
+              className="group inline-flex items-center justify-between sm:justify-center gap-2.5 h-12 sm:h-11 pl-4 pr-2 sm:px-5 rounded-full button-md text-[var(--text-primary)] bg-[var(--surface-primary)] hover:bg-[var(--surface-raised)] active:scale-[0.98] transition-[background-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
+              style={{
+                border: "1px solid var(--border-strong)",
+                boxShadow: "var(--shadow-card)",
+              }}
             >
-              <UploadSimple size={16} weight="regular" aria-hidden="true" />
               <span>Upload paper</span>
+              <span
+                className="w-8 h-8 rounded-full bg-[var(--surface-raised)] flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:-translate-y-0.5"
+                aria-hidden="true"
+              >
+                <UploadSimple size={15} weight="regular" />
+              </span>
             </Link>
           </div>
 
-          <dl className="pt-3 grid grid-cols-3 gap-4 max-w-md border-t border-[var(--border-primary)]">
+          <dl className="pt-3.5 grid grid-cols-3 gap-4 max-w-md border-t border-[var(--border-primary)]">
             <div>
               <dt className="caption-5 text-[var(--text-muted)]">Verified papers</dt>
-              <dd className="mt-0.5 text-lg sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
+              <dd className="mt-0.5 font-mono text-lg sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
                 {totalCatalogPapers}
               </dd>
             </div>
             <div>
               <dt className="caption-5 text-[var(--text-muted)]">Branches</dt>
-              <dd className="mt-0.5 text-lg sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
+              <dd className="mt-0.5 font-mono text-lg sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
                 {branchCount}
               </dd>
             </div>
             <div>
               <dt className="caption-5 text-[var(--text-muted)]">Subjects</dt>
-              <dd className="mt-0.5 text-lg sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
+              <dd className="mt-0.5 font-mono text-lg sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
                 {subjectCount}
               </dd>
             </div>
@@ -114,34 +127,39 @@ export function HeroShowcase({
         </div>
 
         <div className="lg:col-span-6">
-          <div
-            className="w-full h-[188px] sm:h-[250px] lg:h-[340px] rounded-2xl overflow-hidden"
-            style={{
-              backgroundColor: "var(--surface-primary)",
-              border: "1px solid var(--border-primary)",
-              boxShadow: "var(--shadow-card)",
-            }}
-          >
-            <DitherVeil
-              src="/images/hero-study.jpg"
-              alt="Engineering examination booklets and technical blueprint study desk"
-              fit="cover"
-              pattern="floyd"
-              pixelSize={2}
-              levels={2}
-              palette="duotone"
-              inkColor={isDark ? "#0f0f10" : "#171717"}
-              paperColor={isDark ? "#e4e4e7" : "#f4f4f5"}
-              contrast={1.15}
-              brightness={0}
-              revealRadius={180}
-              softness={0.6}
-              linger={1}
-              rimColor="#2563EB"
-              rim={0.14}
-              wander={true}
-              clickBurst={true}
-            />
+          <div className="bezel-shell">
+            <div className="bezel-core overflow-hidden">
+              <div className="w-full h-[188px] sm:h-[250px] lg:h-[340px]">
+                <DitherVeil
+                  src="/images/hero-study.jpg"
+                  alt="Engineering examination booklets and technical blueprint study desk"
+                  fit="cover"
+                  pattern="floyd"
+                  pixelSize={2}
+                  levels={2}
+                  palette="duotone"
+                  inkColor={isDark ? "#111110" : "#161614"}
+                  paperColor={isDark ? "#EAE5DA" : "#F5F1E8"}
+                  contrast={1.15}
+                  brightness={0}
+                  revealRadius={180}
+                  softness={0.6}
+                  linger={1}
+                  rimColor={isDark ? "#3B82F6" : "#1D4ED8"}
+                  rim={0.14}
+                  wander={true}
+                  clickBurst={true}
+                />
+              </div>
+              <div className="px-3.5 py-2 flex items-center justify-between gap-2 border-t border-[var(--border-primary)] bg-[var(--surface-primary)]">
+                <span className="font-mono text-[11px] text-[var(--text-muted)] truncate">
+                  B.TECH ARCHIVE · R20–R23
+                </span>
+                <span className="font-mono text-[11px] text-[var(--text-secondary)] shrink-0 whitespace-nowrap">
+                  PDF FOLIO
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

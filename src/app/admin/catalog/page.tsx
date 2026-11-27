@@ -53,7 +53,7 @@ async function AdminCatalogBody() {
   return (
     <>
       <AdminNav adminName={user.name} />
-      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 py-6">
+      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-4 md:px-6 pt-5 pb-28 md:py-6">
         {dbError || !catalog ? (
           <ServerErrorBanner message={dbError || "Unable to load admin catalog."} />
         ) : (

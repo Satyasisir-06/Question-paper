@@ -11,6 +11,7 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 
 interface SiteHeaderProps {
   searchQuery?: string;
@@ -72,41 +73,50 @@ function HeaderSearchSlot({
 function MobileMenuDrawer({ onClose }: { onClose: () => void }) {
   const pathname = usePathname();
   const links = [
-    { href: "/", label: "Browse question papers" },
-    { href: "/upload", label: "Upload question paper" },
-    { href: "/track", label: "Track upload status" },
+    { href: "/", label: "Browse question papers", note: "Explore verified semesters & booklets" },
+    { href: "/upload", label: "Upload question paper", note: "Capture pages or attach exam PDF" },
+    { href: "/track", label: "Track upload status", note: "Check moderation approval code" },
   ];
 
   return (
     <div
-      className="fixed inset-x-0 top-14 sm:top-16 bottom-0 z-40 sm:hidden p-4 overflow-y-auto backdrop-blur-md"
+      className="fixed inset-x-0 top-14 sm:top-16 bottom-0 z-40 sm:hidden p-4 overflow-y-auto backdrop-blur-xl transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
       style={{
-        backgroundColor: "color-mix(in srgb, var(--surface-primary) 96%, transparent)",
+        backgroundColor: "color-mix(in srgb, var(--surface-canvas) 95%, transparent)",
         borderTop: "1px solid var(--border-primary)",
       }}
     >
-      <nav aria-label="Mobile navigation" className="space-y-1.5">
-        {links.map((item) => {
-          const active =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className={`flex items-center h-12 px-4 rounded-xl title-3 transition-colors duration-200 ${
-                active
-                  ? "bg-[#2563EB] text-white"
-                  : "bg-[var(--surface-raised)] text-[var(--text-primary)]"
-              }`}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+      <div className="bezel-shell max-w-md mx-auto">
+        <nav aria-label="Mobile navigation" className="bezel-core p-2 space-y-1.5">
+          {links.map((item) => {
+            const active =
+              item.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
+                className={`block px-4 py-3 rounded-xl transition-colors duration-200 ${
+                  active
+                    ? "bg-[var(--action-primary)] text-white"
+                    : "bg-[var(--surface-raised)]/60 text-[var(--text-primary)] hover:bg-[var(--surface-raised)]"
+                }`}
+              >
+                <span className="block title-3">{item.label}</span>
+                <span
+                  className={`block caption-5 mt-0.5 ${
+                    active ? "text-white/80" : "text-[var(--text-muted)]"
+                  }`}
+                >
+                  {item.note}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
     </div>
   );
 }
@@ -123,23 +133,28 @@ export function SiteHeader({
       <header
         className="sticky top-0 z-30 h-14 sm:h-16 backdrop-blur-md transition-colors duration-200"
         style={{
-          backgroundColor: "color-mix(in srgb, var(--surface-primary) 90%, transparent)",
+          backgroundColor: "color-mix(in srgb, var(--surface-primary) 88%, transparent)",
           borderBottom: "1px solid var(--border-primary)",
         }}
       >
-        <div className="max-w-7xl mx-auto h-full px-3 sm:px-4 md:px-6 flex items-center justify-between gap-2 sm:gap-4">
+        <div className="max-w-7xl mx-auto h-full px-3.5 sm:px-4 md:px-6 flex items-center justify-between gap-2 sm:gap-4">
           <Link
             href="/"
-            className="flex items-center gap-2 min-w-0 shrink-0 rounded-lg py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+            className="flex items-center gap-2.5 min-w-0 shrink-0 rounded-lg py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
           >
             <span
-              className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#2563EB] text-white shrink-0"
+              className="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--action-primary)] text-white shrink-0 shadow-xs"
               aria-hidden="true"
             >
-              <Books size={18} weight="regular" />
+              <Books size={17} weight="regular" />
             </span>
-            <span className="title-3 text-[var(--text-primary)] tracking-tight truncate">
-              B.Tech PaperVault
+            <span className="flex flex-col leading-none min-w-0">
+              <span className="title-3 text-[var(--text-primary)] tracking-tight truncate">
+                B.Tech PaperVault
+              </span>
+              <span className="hidden sm:inline text-[10px] font-mono text-[var(--text-muted)] tracking-wide">
+                EXAM ARCHIVE
+              </span>
             </span>
           </Link>
 
@@ -169,11 +184,10 @@ export function SiteHeader({
 
             <Link
               href="/upload"
-              className="inline-flex items-center gap-1.5 h-10 sm:h-9 px-3 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.98] transition-[background-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2"
+              className="hidden sm:inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg button-sm text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] active:scale-[0.98] transition-[background-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] focus-visible:ring-offset-2"
             >
               <UploadSimple size={16} weight="regular" />
-              <span className="hidden xs:inline sm:inline">Upload paper</span>
-              <span className="xs:hidden sm:hidden">Upload</span>
+              <span>Upload paper</span>
             </Link>
 
             <button
@@ -181,7 +195,7 @@ export function SiteHeader({
               onClick={() => setMobileMenuOpen((prev) => !prev)}
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileMenuOpen}
-              className="sm:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg text-[var(--text-primary)] bg-[var(--surface-raised)]"
+              className="sm:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl text-[var(--text-primary)] bg-[var(--surface-raised)] active:scale-[0.97] transition-transform cursor-pointer"
               style={{ border: "1px solid var(--border-primary)" }}
             >
               {mobileMenuOpen ? <X size={18} weight="regular" /> : <List size={18} weight="regular" />}
@@ -195,6 +209,10 @@ export function SiteHeader({
           <MobileMenuDrawer onClose={() => setMobileMenuOpen(false)} />
         </Suspense>
       )}
+
+      <Suspense fallback={null}>
+        <MobileBottomNav />
+      </Suspense>
     </>
   );
 }

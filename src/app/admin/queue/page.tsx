@@ -71,7 +71,7 @@ async function AdminQueueBody({
   return (
     <>
       <AdminNav adminName={user.name} />
-      <main id="main-content" className="flex-1 max-w-[1440px] w-full mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6">
+      <main id="main-content" className="flex-1 max-w-[1440px] w-full mx-auto px-3.5 sm:px-4 md:px-6 pt-4 pb-28 md:py-6">
         {dbError || !catalog ? (
           <ServerErrorBanner message={dbError || "Unable to load moderation queue."} />
         ) : (

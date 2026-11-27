@@ -28,10 +28,10 @@ export function YearSemMatrix({
   return (
     <section
       aria-label="Academic year, semester, and exam filters"
-      className="pt-3 border-t border-[var(--border-primary)] sm:pt-4 sm:p-4 sm:rounded-xl sm:bg-[var(--surface-primary)] sm:border sm:border-[var(--border-primary)] sm:shadow-[var(--shadow-card)]"
+      className="pt-3 border-t border-[var(--border-primary)] sm:pt-4 sm:p-4 sm:rounded-2xl sm:bg-[var(--surface-primary)] sm:border sm:border-[var(--border-primary)] sm:shadow-[var(--shadow-card)]"
     >
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5 sm:gap-3">
-        <div className="space-y-1.5 min-w-0">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5 sm:gap-4">
+        <div className="space-y-2 min-w-0">
           <div className="flex items-center justify-between">
             <p className="caption-4 text-[var(--text-secondary)]">
               Year and semester
@@ -40,7 +40,7 @@ export function YearSemMatrix({
               <button
                 type="button"
                 onClick={() => onSelectYearSem(undefined, undefined)}
-                className="sm:hidden caption-4 text-[#2563EB]"
+                className="sm:hidden caption-4 text-[var(--action-primary)]"
               >
                 Show all
               </button>
@@ -50,9 +50,9 @@ export function YearSemMatrix({
             <button
               type="button"
               onClick={() => onSelectYearSem(undefined, undefined)}
-              className={`shrink-0 h-9 sm:h-8 px-3 sm:px-2.5 rounded-lg caption-4 whitespace-nowrap transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
+              className={`shrink-0 h-10 sm:h-8 px-3.5 sm:px-2.5 rounded-xl sm:rounded-lg caption-4 whitespace-nowrap transition-[background-color,color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] ${
                 selectedYear === undefined && selectedSem === undefined
-                  ? "bg-[#2563EB] text-white"
+                  ? "bg-[var(--action-primary)] text-white"
                   : "bg-[var(--surface-raised)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               }`}
             >
@@ -67,9 +67,9 @@ export function YearSemMatrix({
                   onClick={() => onSelectYearSem(opt.year, opt.sem)}
                   aria-pressed={active}
                   title={opt.label}
-                  className={`shrink-0 h-9 sm:h-8 px-3 sm:px-2.5 rounded-lg font-mono caption-4 tabular-nums whitespace-nowrap transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
+                  className={`shrink-0 h-10 sm:h-8 px-3.5 sm:px-2.5 rounded-xl sm:rounded-lg font-mono caption-4 tabular-nums whitespace-nowrap transition-[background-color,color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] ${
                     active
-                      ? "bg-[#2563EB] text-white"
+                      ? "bg-[var(--action-primary)] text-white"
                       : "bg-[var(--surface-raised)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                   }`}
                 >
@@ -80,14 +80,14 @@ export function YearSemMatrix({
           </div>
         </div>
 
-        <div className="space-y-1.5 min-w-0">
+        <div className="space-y-2 min-w-0">
           <p className="caption-4 text-[var(--text-secondary)]">
             Exam category (Regular or Supply)
           </p>
           <div
             role="group"
             aria-label="Exam category filter"
-            className="flex sm:inline-flex items-center gap-1 p-1 rounded-lg bg-[var(--surface-raised)] overflow-x-auto no-scrollbar"
+            className="flex sm:inline-flex items-center gap-1 p-1 rounded-xl sm:rounded-lg bg-[var(--surface-raised)] overflow-x-auto no-scrollbar"
             style={{ border: "1px solid var(--border-primary)" }}
           >
             {EXAM_TABS.map((tab) => {
@@ -98,7 +98,7 @@ export function YearSemMatrix({
                   type="button"
                   onClick={() => onSelectExamType(tab.value)}
                   aria-pressed={active}
-                  className={`shrink-0 h-8 sm:h-7 px-2.5 rounded-md caption-4 whitespace-nowrap transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
+                  className={`shrink-0 h-9 sm:h-7 px-3 sm:px-2.5 rounded-lg sm:rounded-md caption-4 whitespace-nowrap transition-[background-color,color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] ${
                     active
                       ? "bg-[var(--surface-primary)] text-[var(--text-primary)] shadow-xs"
                       : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"

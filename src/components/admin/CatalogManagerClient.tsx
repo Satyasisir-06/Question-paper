@@ -214,7 +214,10 @@ export function CatalogManagerClient({
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="space-y-1">
+        <p className="font-mono text-[11px] text-[var(--text-muted)]">
+          CURRICULUM &amp; DIRECT PUBLISH
+        </p>
         <h1 className="heading-4 text-[var(--text-primary)]">
           Catalog and direct publish
         </h1>
@@ -252,25 +255,47 @@ export function CatalogManagerClient({
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
         <form
           onSubmit={handleDirectPublish}
-          className="rounded-xl p-5 space-y-4"
+          className="rounded-2xl p-4 sm:p-5 space-y-4"
           style={{
             backgroundColor: "var(--surface-primary)",
             border: "1px solid var(--border-primary)",
+            boxShadow: "var(--shadow-card)",
           }}
         >
           <h2 className="heading-6 text-[var(--text-primary)]">
             Direct admin upload (skip queue)
           </h2>
 
-          <input
-            type="file"
-            accept="application/pdf,.pdf"
-            onChange={(e) => setPubFile(e.target.files?.[0] ?? null)}
-            className="w-full body-6 text-[var(--text-secondary)]"
-          />
+          <label
+            className="flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 bg-[var(--surface-raised)] cursor-pointer hover:opacity-90 transition-opacity"
+            style={{ border: "1.5px dashed var(--border-strong)" }}
+          >
+            <div className="min-w-0">
+              <span className="block caption-4 text-[var(--text-primary)] truncate">
+                {pubFile ? pubFile.name : "Choose official exam PDF"}
+              </span>
+              <span className="block caption-5 text-[var(--text-muted)]">
+                {pubFile
+                  ? `${Math.max(1, Math.round(pubFile.size / 1024))} KB PDF selected`
+                  : "Tap to browse a verified PDF file"}
+              </span>
+            </div>
+            <span
+              className="shrink-0 h-9 px-3 rounded-lg inline-flex items-center caption-4 bg-[var(--surface-primary)] text-[var(--text-primary)]"
+              style={{ border: "1px solid var(--border-primary)" }}
+            >
+              Browse
+            </span>
+            <input
+              type="file"
+              accept="application/pdf,.pdf"
+              onChange={(e) => setPubFile(e.target.files?.[0] ?? null)}
+              className="sr-only"
+            />
+          </label>
 
           <div className="grid grid-cols-2 gap-3">
             <select
@@ -503,29 +528,45 @@ export function CatalogManagerClient({
             return (
               <div
                 key={subject.id}
-                className="py-2.5 flex flex-col md:flex-row md:items-center gap-2.5"
+                className="py-3 flex flex-col md:flex-row md:items-center gap-2.5"
               >
-                <div className="flex items-center gap-2 shrink-0">
-                  <input
-                    type="text"
-                    value={draft.code}
-                    aria-label={`Subject code for ${subject.code}`}
-                    onChange={(e) =>
-                      setSubjectDrafts((prev) => ({
-                        ...prev,
-                        [subject.id]: {
-                          ...draft,
-                          code: e.target.value.toUpperCase(),
-                        },
-                      }))
-                    }
-                    className="w-24 h-9 px-2.5 rounded-lg font-mono caption-4 bg-[var(--surface-raised)]"
-                    style={{ border: "1px solid var(--border-primary)" }}
-                  />
-                  <span className="font-mono caption-5 text-[var(--text-muted)] w-28 shrink-0">
-                    {subject.yearOfStudy}-{subject.semester % 2 === 1 ? 1 : 2} ·{" "}
-                    {branchCode} {regCode}
-                  </span>
+                <div className="flex items-center justify-between md:justify-start gap-2 shrink-0">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <input
+                      type="text"
+                      value={draft.code}
+                      aria-label={`Subject code for ${subject.code}`}
+                      onChange={(e) =>
+                        setSubjectDrafts((prev) => ({
+                          ...prev,
+                          [subject.id]: {
+                            ...draft,
+                            code: e.target.value.toUpperCase(),
+                          },
+                        }))
+                      }
+                      className="w-24 h-10 md:h-9 px-2.5 rounded-xl md:rounded-lg font-mono caption-4 bg-[var(--surface-raised)] shrink-0"
+                      style={{ border: "1px solid var(--border-primary)" }}
+                    />
+                    <span className="font-mono caption-5 text-[var(--text-muted)] truncate md:w-28 shrink-0">
+                      {subject.yearOfStudy}-{subject.semester % 2 === 1 ? 1 : 2} ·{" "}
+                      {branchCode} {regCode}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={!dirty || busy}
+                    onClick={() => void handleSaveSubject(subject)}
+                    className={`md:hidden inline-flex items-center justify-center gap-1 h-9 px-3 rounded-lg caption-4 shrink-0 cursor-pointer transition-colors ${
+                      dirty
+                        ? "text-white bg-[var(--action-primary)]"
+                        : "text-[var(--text-muted)] bg-[var(--surface-raised)] border border-[var(--border-primary)]"
+                    }`}
+                  >
+                    <Check size={14} weight="bold" />
+                    <span>{busy ? "Saving..." : "Save"}</span>
+                  </button>
                 </div>
 
                 <input
@@ -541,7 +582,7 @@ export function CatalogManagerClient({
                       },
                     }))
                   }
-                  className="flex-1 h-9 px-2.5 rounded-lg body-6 bg-[var(--surface-raised)]"
+                  className="w-full md:flex-1 h-10 md:h-9 px-3 rounded-xl md:rounded-lg text-base md:text-sm bg-[var(--surface-raised)] text-[var(--text-primary)]"
                   style={{ border: "1px solid var(--border-primary)" }}
                 />
 
@@ -549,7 +590,11 @@ export function CatalogManagerClient({
                   type="button"
                   disabled={!dirty || busy}
                   onClick={() => void handleSaveSubject(subject)}
-                  className="inline-flex items-center justify-center gap-1.5 h-9 px-3 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-45 shrink-0 cursor-pointer"
+                  className={`hidden md:inline-flex items-center justify-center gap-1.5 h-9 px-3 rounded-lg button-sm shrink-0 cursor-pointer transition-colors ${
+                    dirty
+                      ? "text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)]"
+                      : "text-[var(--text-muted)] bg-[var(--surface-raised)] border border-[var(--border-primary)]"
+                  }`}
                 >
                   <Check size={14} weight="bold" />
                   <span>{busy ? "Saving..." : "Save"}</span>
@@ -562,10 +607,11 @@ export function CatalogManagerClient({
 
       <section
         aria-label="Recent audit logs"
-        className="rounded-xl p-5 space-y-3"
+        className="rounded-2xl p-4 sm:p-5 space-y-3"
         style={{
           backgroundColor: "var(--surface-primary)",
           border: "1px solid var(--border-primary)",
+          boxShadow: "var(--shadow-card)",
         }}
       >
         <h2 className="heading-6 text-[var(--text-primary)]">
@@ -574,36 +620,59 @@ export function CatalogManagerClient({
         {initialAuditLogs.length === 0 ? (
           <p className="body-6 text-[var(--text-muted)]">No admin actions recorded yet.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-[var(--border-primary)] caption-4 text-[var(--text-muted)]">
-                  <th className="py-2 pr-4">Action</th>
-                  <th className="py-2 pr-4">Entity</th>
-                  <th className="py-2 pr-4">IP</th>
-                  <th className="py-2">Timestamp</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--border-primary)] font-mono caption-5">
-                {initialAuditLogs.map((log) => (
-                  <tr key={log.id}>
-                    <td className="py-2 pr-4 text-[var(--text-primary)]">
+          <>
+            <div className="md:hidden divide-y divide-[var(--border-primary)]">
+              {initialAuditLogs.map((log) => (
+                <div key={log.id} className="py-2.5 flex items-start justify-between gap-2">
+                  <div className="min-w-0 space-y-0.5 font-mono">
+                    <p className="caption-4 text-[var(--text-primary)] truncate">
                       {log.action}
-                    </td>
-                    <td className="py-2 pr-4 text-[var(--text-secondary)]">
-                      {log.entityType} ({log.entityId.slice(0, 8)})
-                    </td>
-                    <td className="py-2 pr-4 text-[var(--text-muted)]">
-                      {log.ipAddress ?? "-"}
-                    </td>
-                    <td className="py-2 text-[var(--text-muted)]" suppressHydrationWarning>
-                      {new Date(log.createdAt).toLocaleString()}
-                    </td>
+                    </p>
+                    <p className="caption-5 text-[var(--text-secondary)] truncate">
+                      {log.entityType} ({log.entityId.slice(0, 8)}) · {log.ipAddress ?? "-"}
+                    </p>
+                  </div>
+                  <span
+                    className="font-mono caption-5 text-[var(--text-muted)] shrink-0 text-right"
+                    suppressHydrationWarning
+                  >
+                    {new Date(log.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-[var(--border-primary)] caption-4 text-[var(--text-muted)]">
+                    <th className="py-2 pr-4">Action</th>
+                    <th className="py-2 pr-4">Entity</th>
+                    <th className="py-2 pr-4">IP</th>
+                    <th className="py-2">Timestamp</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-[var(--border-primary)] font-mono caption-5">
+                  {initialAuditLogs.map((log) => (
+                    <tr key={log.id}>
+                      <td className="py-2 pr-4 text-[var(--text-primary)]">
+                        {log.action}
+                      </td>
+                      <td className="py-2 pr-4 text-[var(--text-secondary)]">
+                        {log.entityType} ({log.entityId.slice(0, 8)})
+                      </td>
+                      <td className="py-2 pr-4 text-[var(--text-muted)]">
+                        {log.ipAddress ?? "-"}
+                      </td>
+                      <td className="py-2 text-[var(--text-muted)]" suppressHydrationWarning>
+                        {new Date(log.createdAt).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
     </div>

@@ -91,10 +91,10 @@ async function PaperDetailContent({
   return (
     <main
       id="main-content"
-      className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 flex flex-col gap-4"
+      className="flex-1 max-w-6xl w-full mx-auto px-3.5 sm:px-4 md:px-6 pt-4 sm:pt-6 pb-28 md:pb-8 flex flex-col gap-4"
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 caption-4 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -104,7 +104,7 @@ async function PaperDetailContent({
           </Link>
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono caption-4 px-2 py-0.5 rounded bg-[var(--surface-raised)] text-[var(--text-primary)]">
+            <span className="font-mono caption-4 px-2 py-0.5 rounded-md bg-[var(--surface-raised)] text-[var(--text-primary)]">
               {paper.subjectCode}
             </span>
             <span className="font-mono caption-4 text-[var(--text-secondary)]">
@@ -113,25 +113,27 @@ async function PaperDetailContent({
             <ExamTypeBadge examType={paper.examType} />
           </div>
 
-          <h1 className="heading-6 text-[var(--text-primary)]">
+          <h1 className="heading-4 sm:heading-6 text-[var(--text-primary)]">
             {paper.subjectName} ({session})
           </h1>
         </div>
 
         <a
           href={`/api/v1/papers/${paper.id}/download`}
-          className="inline-flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.98] transition-[background-color,transform] duration-200"
+          className="inline-flex items-center justify-center gap-2 h-12 sm:h-10 px-5 rounded-xl sm:rounded-lg button-sm text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] active:scale-[0.98] transition-[background-color,transform] duration-200"
         >
           <DownloadSimple size={16} weight="regular" />
           <span>Download PDF ({formatFileSize(paper.fileSizeBytes)})</span>
         </a>
       </div>
 
-      <div className="h-[75dvh] min-h-[520px] rounded-2xl p-2 sm:p-3 bg-[var(--surface-primary)] border border-[var(--border-primary)]">
-        <PdfViewer
-          src={`/api/v1/papers/${paper.id}/view`}
-          title={`${paper.subjectCode} ${paper.subjectName}`}
-        />
+      <div className="bezel-shell">
+        <div className="bezel-core h-[72dvh] min-h-[480px] p-2 sm:p-3 overflow-hidden">
+          <PdfViewer
+            src={`/api/v1/papers/${paper.id}/view`}
+            title={`${paper.subjectCode} ${paper.subjectName}`}
+          />
+        </div>
       </div>
     </main>
   );

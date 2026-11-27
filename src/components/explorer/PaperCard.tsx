@@ -28,39 +28,40 @@ export const PaperCard = memo(function PaperCard({
 
   return (
     <article
-      className="paper-card-perf rounded-xl p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 transition-[border-color,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[var(--border-strong)]"
+      className="paper-card-perf rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 transition-[border-color,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[var(--border-strong)]"
       style={{
         backgroundColor: "var(--surface-primary)",
         border: selected
-          ? "1px solid #2563EB"
+          ? "1.5px solid var(--action-primary)"
           : "1px solid var(--border-primary)",
         boxShadow: "var(--shadow-card)",
       }}
     >
-      <div className="flex items-start gap-2.5 sm:gap-3 min-w-0">
-        <label className="pt-0.5 flex items-center cursor-pointer min-w-[20px] min-h-[24px] shrink-0">
+      <div className="flex items-start gap-3 min-w-0">
+        <label className="pt-0.5 flex items-center cursor-pointer min-w-[22px] min-h-[26px] shrink-0">
           <input
             type="checkbox"
             checked={selected}
             onChange={() => onToggleSelect(paper.id)}
             aria-label={`Select ${paper.subjectCode} ${paper.subjectName}`}
-            className="w-4 h-4 rounded accent-[#2563EB] cursor-pointer"
+            className="w-4 h-4 rounded accent-[#1D4ED8] cursor-pointer"
           />
         </label>
 
         <div
-          className="hidden sm:flex w-10 h-10 rounded-lg shrink-0 items-center justify-center bg-[var(--surface-raised)] text-[var(--text-secondary)]"
+          className="hidden sm:flex w-11 h-11 rounded-xl shrink-0 items-center justify-center bg-[var(--surface-raised)] text-[var(--text-secondary)]"
+          style={{ border: "1px solid var(--border-primary)" }}
           aria-hidden="true"
         >
           <FilePdf size={20} weight="regular" />
         </div>
 
-        <div className="min-w-0 space-y-1 flex-1">
+        <div className="min-w-0 space-y-1.5 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="font-mono caption-4 px-2 py-0.5 rounded bg-[var(--surface-raised)] text-[var(--text-primary)]">
+            <span className="font-mono caption-4 px-2 py-0.5 rounded-md bg-[var(--surface-raised)] text-[var(--text-primary)]">
               {paper.subjectCode}
             </span>
-            <span className="font-mono caption-4 px-2 py-0.5 rounded bg-[var(--surface-raised)] text-[var(--text-secondary)]">
+            <span className="font-mono caption-4 px-2 py-0.5 rounded-md bg-[var(--surface-raised)] text-[var(--text-secondary)]">
               {yearSem}
             </span>
             <span className="font-mono caption-4 text-[var(--text-muted)]">
@@ -69,7 +70,7 @@ export const PaperCard = memo(function PaperCard({
             <ExamTypeBadge examType={paper.examType} />
           </div>
 
-          <h3 className="text-[15px] sm:text-base font-medium text-[var(--text-primary)] leading-snug">
+          <h3 className="text-[16px] sm:text-[17px] font-medium text-[var(--text-primary)] leading-snug">
             {paper.subjectName}
           </h3>
 
@@ -82,11 +83,11 @@ export const PaperCard = memo(function PaperCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:flex items-center gap-2 shrink-0 sm:self-center">
+      <div className="pt-2.5 sm:pt-0 border-t border-[var(--border-primary)] sm:border-t-0 grid grid-cols-2 sm:flex items-center gap-2 shrink-0 sm:self-center">
         <button
           type="button"
           onClick={() => onPreview(paper)}
-          className="inline-flex items-center justify-center gap-1.5 h-10 sm:h-9 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] transition-[opacity,transform] duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+          className="inline-flex items-center justify-center gap-1.5 h-11 sm:h-9 px-3.5 rounded-xl sm:rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] transition-[opacity,transform] duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
           style={{ border: "1px solid var(--border-primary)" }}
         >
           <Eye size={16} weight="regular" />
@@ -95,7 +96,7 @@ export const PaperCard = memo(function PaperCard({
 
         <a
           href={`/api/v1/papers/${paper.id}/download`}
-          className="inline-flex items-center justify-center gap-1.5 h-10 sm:h-9 px-3 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.98] transition-[background-color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+          className="inline-flex items-center justify-center gap-1.5 h-11 sm:h-9 px-3.5 rounded-xl sm:rounded-lg button-sm text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] active:scale-[0.98] transition-[background-color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
         >
           <DownloadSimple size={16} weight="regular" />
           <span>Download</span>

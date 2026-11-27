@@ -503,88 +503,87 @@ export function UploadFormClient({
 
   if (receipt) {
     return (
-      <div
-        className="max-w-xl mx-auto rounded-2xl p-5 sm:p-6 space-y-5"
-        style={{
-          backgroundColor: "var(--surface-primary)",
-          border: "1px solid var(--border-primary)",
-          boxShadow: "var(--shadow-card)",
-        }}
-      >
-        <div className="flex items-center gap-3">
-          <span
-            className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-            style={{
-              backgroundColor: "var(--badge-regular-bg)",
-              color: "var(--badge-regular-text)",
-            }}
-          >
-            <CheckCircle size={22} weight="regular" />
-          </span>
-          <div>
-            <h1 className="heading-6 text-[var(--text-primary)]">
-              Question paper submitted for review
-            </h1>
-            <p className="body-6 text-[var(--text-secondary)]">
-              Your {receipt.pageCount} page PDF is safely queued for admin approval.
-            </p>
+      <div className="max-w-xl mx-auto bezel-shell">
+        <div className="bezel-core p-5 sm:p-6 space-y-5">
+          <div className="flex items-center gap-3">
+            <span
+              className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+              style={{
+                backgroundColor: "var(--badge-regular-bg)",
+                color: "var(--badge-regular-text)",
+                border: "1px solid var(--badge-regular-border)",
+              }}
+            >
+              <CheckCircle size={22} weight="regular" />
+            </span>
+            <div>
+              <p className="font-mono text-[11px] text-[var(--text-muted)]">
+                ARCHIVAL RECEIPT
+              </p>
+              <h1 className="heading-6 text-[var(--text-primary)]">
+                Question paper submitted for review
+              </h1>
+              <p className="body-6 text-[var(--text-secondary)]">
+                Your {receipt.pageCount} page PDF is safely queued for admin approval.
+              </p>
+            </div>
           </div>
-        </div>
 
-        <div
-          className="rounded-xl p-4 flex items-center justify-between gap-3 bg-[var(--surface-raised)]"
-          style={{ border: "1px solid var(--border-primary)" }}
-        >
-          <div>
-            <p className="caption-4 text-[var(--text-muted)]">Tracking code</p>
-            <p className="font-mono heading-6 text-[var(--text-primary)] mt-0.5">
-              {receipt.trackingCode}
-            </p>
+          <div
+            className="rounded-xl p-4 flex items-center justify-between gap-3 bg-[var(--surface-raised)]"
+            style={{ border: "1px dashed var(--border-strong)" }}
+          >
+            <div>
+              <p className="caption-4 text-[var(--text-muted)]">Tracking code</p>
+              <p className="font-mono text-xl font-medium tracking-wide text-[var(--text-primary)] mt-0.5">
+                {receipt.trackingCode}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={async () => {
+                await navigator.clipboard.writeText(receipt.trackingCode);
+                setCopiedCode(true);
+                setTimeout(() => setCopiedCode(false), 1800);
+              }}
+              className="inline-flex items-center gap-1.5 h-11 sm:h-10 px-3.5 rounded-xl sm:rounded-lg button-sm bg-[var(--surface-primary)] text-[var(--text-primary)] cursor-pointer"
+              style={{ border: "1px solid var(--border-primary)" }}
+            >
+              {copiedCode ? <Check size={16} /> : <Copy size={16} />}
+              <span>{copiedCode ? "Copied" : "Copy"}</span>
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={async () => {
-              await navigator.clipboard.writeText(receipt.trackingCode);
-              setCopiedCode(true);
-              setTimeout(() => setCopiedCode(false), 1800);
-            }}
-            className="inline-flex items-center gap-1.5 h-10 px-3 rounded-lg button-sm bg-[var(--surface-primary)] text-[var(--text-primary)] cursor-pointer"
-            style={{ border: "1px solid var(--border-primary)" }}
-          >
-            {copiedCode ? <Check size={16} /> : <Copy size={16} />}
-            <span>{copiedCode ? "Copied" : "Copy"}</span>
-          </button>
-        </div>
 
-        <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5">
-          <Link
-            href={`/track?code=${encodeURIComponent(receipt.trackingCode)}`}
-            className="inline-flex items-center justify-center h-11 sm:h-10 px-4 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8]"
-          >
-            Track approval status
-          </Link>
-          <button
-            type="button"
-            onClick={() => {
-              scanGenRef.current += 1;
-              photoOpGenRef.current += 1;
-              dirtyFieldsRef.current = new Set();
-              clearPhotoPages();
-              setReceipt(null);
-              setFile(null);
-              setClientPages(null);
-              setScanOutcome(null);
-              setScanStatusText("");
-              setUseCustomSubject(false);
-              setSubjectId("");
-              setCustomSubjectCode("");
-              setCustomSubjectName("");
-            }}
-            className="h-11 sm:h-10 px-4 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] cursor-pointer"
-            style={{ border: "1px solid var(--border-primary)" }}
-          >
-            Upload another paper
-          </button>
+          <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5">
+            <Link
+              href={`/track?code=${encodeURIComponent(receipt.trackingCode)}`}
+              className="inline-flex items-center justify-center h-11 sm:h-10 px-5 rounded-xl sm:rounded-lg button-sm text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)]"
+            >
+              Track approval status
+            </Link>
+            <button
+              type="button"
+              onClick={() => {
+                scanGenRef.current += 1;
+                photoOpGenRef.current += 1;
+                dirtyFieldsRef.current = new Set();
+                clearPhotoPages();
+                setReceipt(null);
+                setFile(null);
+                setClientPages(null);
+                setScanOutcome(null);
+                setScanStatusText("");
+                setUseCustomSubject(false);
+                setSubjectId("");
+                setCustomSubjectCode("");
+                setCustomSubjectName("");
+              }}
+              className="h-11 sm:h-10 px-4 rounded-xl sm:rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] cursor-pointer"
+              style={{ border: "1px solid var(--border-primary)" }}
+            >
+              Upload another paper
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -717,7 +716,7 @@ export function UploadFormClient({
               type="button"
               disabled={convertingPhotos || submitting}
               onClick={() => openPicker("camera", photoPages.length > 0)}
-              className="inline-flex items-center justify-center gap-2 h-11 px-4 rounded-xl button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.98] disabled:opacity-60 transition-[background-color,transform] duration-200 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 h-12 sm:h-11 px-4 rounded-xl button-sm text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] active:scale-[0.98] disabled:opacity-60 transition-[background-color,transform] duration-200 cursor-pointer"
             >
               <Camera size={18} weight="regular" />
               <span>
@@ -729,7 +728,7 @@ export function UploadFormClient({
               type="button"
               disabled={convertingPhotos || submitting}
               onClick={() => openPicker("files", false)}
-              className="inline-flex items-center justify-center gap-2 h-11 px-4 rounded-xl button-sm text-[var(--text-primary)] bg-[var(--surface-primary)] hover:opacity-90 active:scale-[0.98] disabled:opacity-60 transition-[opacity,transform] duration-200 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 h-12 sm:h-11 px-4 rounded-xl button-sm text-[var(--text-primary)] bg-[var(--surface-primary)] hover:opacity-90 active:scale-[0.98] disabled:opacity-60 transition-[opacity,transform] duration-200 cursor-pointer"
               style={{ border: "1px solid var(--border-primary)" }}
             >
               <UploadSimple size={18} weight="regular" />
@@ -1243,24 +1242,24 @@ export function UploadFormClient({
           <div
             role="status"
             aria-live="polite"
-            className="rounded-xl p-3.5 space-y-2 bg-[var(--surface-raised)] border border-[#2563EB]/40"
+            className="rounded-xl p-3.5 space-y-2 bg-[var(--surface-raised)] border border-[#1D4ED8]/40"
           >
             <div className="flex items-center justify-between gap-2 caption-4 text-[var(--text-primary)]">
               <span className="inline-flex items-center gap-2">
-                <CircleNotch size={16} className="animate-spin text-[#2563EB]" />
+                <CircleNotch size={16} className="animate-spin text-[var(--action-primary)]" />
                 <span>
                   {uploadStage === "saving"
                     ? "Saving submission to review queue..."
                     : "Uploading question paper PDF..."}
                 </span>
               </span>
-              <span className="font-mono tabular-nums text-[#2563EB]">
+              <span className="font-mono tabular-nums text-[var(--action-primary)]">
                 {uploadProgress}%
               </span>
             </div>
             <div className="w-full h-1.5 rounded-full bg-[var(--surface-primary)] overflow-hidden">
               <div
-                className="h-full bg-[#2563EB] transition-[width] duration-150"
+                className="h-full bg-[var(--action-primary)] transition-[width] duration-150"
                 style={{ width: `${Math.max(8, uploadProgress)}%` }}
               />
             </div>
@@ -1284,14 +1283,14 @@ export function UploadFormClient({
         <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3 pt-1">
           <Link
             href="/"
-            className="h-11 sm:h-10 px-4 inline-flex items-center justify-center rounded-lg button-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-raised)] sm:bg-transparent"
+            className="h-12 sm:h-10 px-4 inline-flex items-center justify-center rounded-xl sm:rounded-lg button-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-raised)] sm:bg-transparent"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={submitting || convertingPhotos}
-            className="inline-flex items-center justify-center gap-2 h-11 sm:h-10 px-5 rounded-lg button-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.98] disabled:opacity-60 transition-[background-color,transform] duration-200 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 h-12 sm:h-10 px-5 rounded-xl sm:rounded-lg button-sm text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] active:scale-[0.98] disabled:opacity-60 transition-[background-color,transform] duration-200 cursor-pointer"
           >
             {submitting ? (
               <CircleNotch size={16} className="animate-spin" />
