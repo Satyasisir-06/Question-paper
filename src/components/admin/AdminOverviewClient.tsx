@@ -122,14 +122,15 @@ export function AdminOverviewClient({
             value: reports.filter((r) => r.status === "OPEN").length,
             note: "Student flags",
           },
-        ].map((card) => (
+        ].map((card, idx) => (
           <div
             key={card.label}
-            className="rounded-2xl p-4 sm:p-5 space-y-1.5"
+            className="reveal-up rounded-2xl p-4 sm:p-5 space-y-1.5"
             style={{
               backgroundColor: "var(--surface-primary)",
               border: "1px solid var(--border-primary)",
               boxShadow: "var(--shadow-card)",
+              animationDelay: `${idx * 45}ms`,
             }}
           >
             <p className="caption-4 text-[var(--text-secondary)]">{card.label}</p>

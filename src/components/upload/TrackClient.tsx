@@ -124,7 +124,7 @@ export function TrackClient({
           <button
             type="submit"
             disabled={loading || !code.trim()}
-            className="inline-flex items-center justify-center gap-2 h-11 sm:h-10 px-5 rounded-xl button-sm text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] active:scale-[0.98] disabled:opacity-60 transition-[background-color,transform] duration-200 cursor-pointer shrink-0"
+            className="tap-press inline-flex items-center justify-center gap-2 h-11 sm:h-10 px-5 rounded-xl button-sm text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] disabled:opacity-60 cursor-pointer shrink-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
           >
             {loading ? (
               <CircleNotch size={16} className="animate-spin" />
@@ -174,7 +174,7 @@ export function TrackClient({
       )}
 
       {result && (
-        <div className="bezel-shell">
+        <div className="reveal-up bezel-shell">
           <div className="bezel-core p-5 sm:p-6 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="font-mono caption-4 text-[var(--text-muted)]">

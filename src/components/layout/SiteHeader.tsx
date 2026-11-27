@@ -80,13 +80,13 @@ function MobileMenuDrawer({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-x-0 top-14 sm:top-16 bottom-0 z-40 sm:hidden p-4 overflow-y-auto backdrop-blur-xl transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+      className="fade-in fixed inset-x-0 top-14 sm:top-16 bottom-0 z-40 sm:hidden p-4 overflow-y-auto backdrop-blur-xl"
       style={{
         backgroundColor: "color-mix(in srgb, var(--surface-canvas) 95%, transparent)",
         borderTop: "1px solid var(--border-primary)",
       }}
     >
-      <div className="bezel-shell max-w-md mx-auto">
+      <div className="bezel-shell sheet-up max-w-md mx-auto">
         <nav aria-label="Mobile navigation" className="bezel-core p-2 space-y-1.5">
           {links.map((item) => {
             const active =
@@ -98,7 +98,7 @@ function MobileMenuDrawer({ onClose }: { onClose: () => void }) {
                 key={item.href}
                 href={item.href}
                 onClick={onClose}
-                className={`block px-4 py-3 rounded-xl transition-colors duration-200 ${
+                className={`tap-press block px-4 py-3 rounded-xl ${
                   active
                     ? "bg-[var(--action-primary)] text-white"
                     : "bg-[var(--surface-raised)]/60 text-[var(--text-primary)] hover:bg-[var(--surface-raised)]"

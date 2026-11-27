@@ -319,7 +319,7 @@ export function ExplorerClient({
               <button
                 type="button"
                 onClick={() => setBranch("")}
-                className={`shrink-0 h-9 px-3 rounded-xl caption-4 transition-colors duration-200 cursor-pointer ${
+                className={`tap-press shrink-0 h-9 px-3 rounded-xl caption-4 cursor-pointer active:scale-[0.94] ${
                   branch === ""
                     ? "bg-[var(--action-primary)] text-white"
                     : "bg-[var(--surface-raised)] text-[var(--text-secondary)]"
@@ -334,7 +334,7 @@ export function ExplorerClient({
                     key={br.id}
                     type="button"
                     onClick={() => setBranch(active ? "" : br.code)}
-                    className={`shrink-0 h-9 px-3 rounded-xl font-mono caption-4 transition-colors duration-200 cursor-pointer ${
+                    className={`tap-press shrink-0 h-9 px-3 rounded-xl font-mono caption-4 cursor-pointer active:scale-[0.94] ${
                       active
                         ? "bg-[var(--action-primary)] text-white"
                         : "bg-[var(--surface-raised)] text-[var(--text-secondary)]"
@@ -388,13 +388,19 @@ export function ExplorerClient({
                   <button
                     type="button"
                     onClick={() => setMobileFiltersOpen(true)}
-                    className="lg:hidden inline-flex items-center gap-1.5 h-8 sm:h-9 px-2.5 sm:px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] shrink-0 cursor-pointer"
+                    className="lg:hidden tap-press inline-flex items-center gap-1.5 h-9 px-3 rounded-xl button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] shrink-0 cursor-pointer"
                     style={{ border: "1px solid var(--border-primary)" }}
                   >
                     <Funnel size={14} weight="regular" />
                     <span>
                       Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
                     </span>
+                    {activeFilterCount > 0 && (
+                      <span
+                        aria-hidden="true"
+                        className="w-1.5 h-1.5 rounded-full bg-[var(--action-primary)] badge-pop"
+                      />
+                    )}
                   </button>
                   <span className="font-mono caption-4 text-[var(--text-secondary)] truncate max-w-full">
                     {breadcrumbParts}
@@ -492,10 +498,14 @@ export function ExplorerClient({
                         },
                       })
                     }
-                    className="w-auto inline-flex items-center justify-center gap-1.5 h-8 sm:h-9 px-3 rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] disabled:opacity-60 transition-[opacity,transform] duration-200 cursor-pointer"
+                    className="group tap-press w-auto inline-flex items-center justify-center gap-1.5 h-9 px-3 rounded-xl sm:rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 disabled:opacity-60 cursor-pointer"
                     style={{ border: "1px solid var(--border-primary)" }}
                   >
-                    <Package size={15} weight="regular" />
+                    <Package
+                      size={15}
+                      weight="regular"
+                      className="transition-transform duration-200 group-hover:scale-110 group-active:translate-y-0.5"
+                    />
                     <span className="hidden sm:inline">
                       {zipDownloading ? "Packaging ZIP" : "Download folder (ZIP)"}
                     </span>
@@ -523,7 +533,7 @@ export function ExplorerClient({
 
             {selectedIds.length > 0 && viewMode === "cards" && (
               <div
-                className="fixed bottom-20 md:bottom-4 inset-x-3 z-20 sm:static rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3 backdrop-blur-md"
+                className="sheet-up fixed bottom-20 md:bottom-4 inset-x-3 z-20 sm:static rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3 backdrop-blur-md"
                 style={{
                   backgroundColor: "color-mix(in srgb, var(--surface-primary) 94%, transparent)",
                   border: "1.5px solid var(--action-primary)",

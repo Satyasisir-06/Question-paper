@@ -121,13 +121,23 @@ export function AdminNav({ adminName }: { adminName?: string }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`h-11 rounded-xl flex items-center justify-center gap-1.5 caption-4 transition-[background-color,color,transform] duration-200 active:scale-[0.97] ${
+                className={`tap-press relative h-11 rounded-xl flex items-center justify-center gap-1.5 caption-4 active:scale-[0.94] ${
                   active
-                    ? "bg-[var(--action-primary)] text-white"
+                    ? "bg-[var(--action-primary)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
                     : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-raised)]"
                 }`}
               >
-                <Icon size={17} weight={active ? "fill" : "regular"} />
+                {active && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-1 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-white/80 badge-pop"
+                  />
+                )}
+                <Icon
+                  size={17}
+                  weight={active ? "fill" : "regular"}
+                  className={active ? "scale-105 transition-transform" : "transition-transform"}
+                />
                 <span>{item.mobileLabel}</span>
               </Link>
             );

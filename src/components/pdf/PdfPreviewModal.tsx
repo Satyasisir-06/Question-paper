@@ -102,13 +102,13 @@ function PdfPreviewDialogBody({
       role="dialog"
       aria-modal="true"
       aria-labelledby="pdf-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/55 backdrop-blur-xs"
+      className="fade-in fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/55 backdrop-blur-xs"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <div
-        className="w-full max-w-5xl h-[100dvh] sm:h-[92vh] rounded-none sm:rounded-[1.5rem] p-3.5 sm:p-4 pb-[calc(0.875rem+env(safe-area-inset-bottom))] flex flex-col gap-2.5 sm:gap-3 transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        className="sheet-up w-full max-w-5xl h-[100dvh] sm:h-[92vh] rounded-none sm:rounded-[1.5rem] p-3.5 sm:p-4 pb-[calc(0.875rem+env(safe-area-inset-bottom))] flex flex-col gap-2.5 sm:gap-3"
         style={{
           backgroundColor: "var(--surface-primary)",
           border: "1px solid var(--border-primary)",

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  CaretDown,
   CaretRight,
   DownloadSimple,
   Eye,
@@ -60,13 +59,15 @@ export function FolderTree({
               <button
                 type="button"
                 onClick={() => toggleYear(yearNode.yearOfStudy)}
-                className="flex items-center gap-2 text-left text-[var(--text-primary)] cursor-pointer min-w-0"
+                className="tap-press flex items-center gap-2 text-left text-[var(--text-primary)] cursor-pointer min-w-0"
               >
-                {isYearOpen ? (
-                  <CaretDown size={16} weight="regular" className="shrink-0" />
-                ) : (
-                  <CaretRight size={16} weight="regular" className="shrink-0" />
-                )}
+                <CaretRight
+                  size={16}
+                  weight="regular"
+                  className={`shrink-0 transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                    isYearOpen ? "rotate-90" : ""
+                  }`}
+                />
                 {isYearOpen ? (
                   <FolderOpen size={18} weight="regular" className="text-[var(--action-primary)] shrink-0" />
                 ) : (
@@ -84,7 +85,7 @@ export function FolderTree({
                   onClick={() =>
                     onDownloadFolderZip({ year: yearNode.yearOfStudy })
                   }
-                  className="inline-flex items-center gap-1.5 h-9 sm:h-8 px-2.5 rounded-lg caption-4 text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 shrink-0 cursor-pointer"
+                  className="tap-press inline-flex items-center gap-1.5 h-9 sm:h-8 px-2.5 rounded-lg caption-4 text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 shrink-0 cursor-pointer"
                   style={{ border: "1px solid var(--border-primary)" }}
                 >
                   <DownloadSimple size={14} weight="regular" />
@@ -95,7 +96,7 @@ export function FolderTree({
             </div>
 
             {isYearOpen && (
-              <div className="px-3 sm:px-4 pb-3 space-y-2.5">
+              <div className="reveal-up px-3 sm:px-4 pb-3 space-y-2.5">
                 {yearNode.semesters.map((semNode) => {
                   const isSemOpen = Boolean(openSems[semNode.semester]);
                   return (
@@ -108,13 +109,15 @@ export function FolderTree({
                         <button
                           type="button"
                           onClick={() => toggleSem(semNode.semester)}
-                          className="flex items-center gap-2 text-left text-[var(--text-primary)] cursor-pointer min-w-0"
+                          className="tap-press flex items-center gap-2 text-left text-[var(--text-primary)] cursor-pointer min-w-0"
                         >
-                          {isSemOpen ? (
-                            <CaretDown size={14} weight="regular" className="shrink-0" />
-                          ) : (
-                            <CaretRight size={14} weight="regular" className="shrink-0" />
-                          )}
+                          <CaretRight
+                            size={14}
+                            weight="regular"
+                            className={`shrink-0 transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                              isSemOpen ? "rotate-90" : ""
+                            }`}
+                          />
                           <span className="font-mono caption-4 px-1.5 py-0.5 rounded bg-[var(--surface-primary)] shrink-0">
                             {semNode.code}
                           </span>

@@ -28,7 +28,7 @@ export const PaperCard = memo(function PaperCard({
 
   return (
     <article
-      className="paper-card-perf rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 transition-[border-color,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[var(--border-strong)]"
+      className="reveal-up paper-card-perf rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 transition-[border-color,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[var(--border-strong)]"
       style={{
         backgroundColor: "var(--surface-primary)",
         border: selected
@@ -44,7 +44,7 @@ export const PaperCard = memo(function PaperCard({
             checked={selected}
             onChange={() => onToggleSelect(paper.id)}
             aria-label={`Select ${paper.subjectCode} ${paper.subjectName}`}
-            className="w-4 h-4 rounded accent-[#1D4ED8] cursor-pointer"
+            className="w-4 h-4 rounded accent-[#1D4ED8] transition-transform duration-150 active:scale-90 cursor-pointer"
           />
         </label>
 
@@ -87,18 +87,26 @@ export const PaperCard = memo(function PaperCard({
         <button
           type="button"
           onClick={() => onPreview(paper)}
-          className="inline-flex items-center justify-center gap-1.5 h-11 sm:h-9 px-3.5 rounded-xl sm:rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 active:scale-[0.98] transition-[opacity,transform] duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
+          className="group/prev tap-press inline-flex items-center justify-center gap-1.5 h-11 sm:h-9 px-3.5 rounded-xl sm:rounded-lg button-sm text-[var(--text-primary)] bg-[var(--surface-raised)] hover:opacity-90 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
           style={{ border: "1px solid var(--border-primary)" }}
         >
-          <Eye size={16} weight="regular" />
+          <Eye
+            size={16}
+            weight="regular"
+            className="transition-transform duration-200 group-hover/prev:scale-110 group-active/prev:scale-95"
+          />
           <span>Preview</span>
         </button>
 
         <a
           href={`/api/v1/papers/${paper.id}/download`}
-          className="inline-flex items-center justify-center gap-1.5 h-11 sm:h-9 px-3.5 rounded-xl sm:rounded-lg button-sm text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] active:scale-[0.98] transition-[background-color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
+          className="group/dl tap-press inline-flex items-center justify-center gap-1.5 h-11 sm:h-9 px-3.5 rounded-xl sm:rounded-lg button-sm text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
         >
-          <DownloadSimple size={16} weight="regular" />
+          <DownloadSimple
+            size={16}
+            weight="regular"
+            className="transition-transform duration-200 group-hover/dl:translate-y-0.5 group-active/dl:translate-y-1"
+          />
           <span>Download</span>
         </a>
       </div>

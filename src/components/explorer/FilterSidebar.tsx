@@ -184,12 +184,12 @@ export function FilterSidebar({
           aria-label="Filter question papers"
         >
           <div
-            className="fixed inset-0 bg-black/45 backdrop-blur-xs"
+            className="fade-in fixed inset-0 bg-black/45 backdrop-blur-xs"
             onClick={onCloseMobile}
             aria-hidden="true"
           />
           <div
-            className="relative w-full max-w-lg max-h-[85dvh] rounded-t-[1.75rem] flex flex-col z-10 overflow-hidden"
+            className="sheet-up relative w-full max-w-lg max-h-[85dvh] rounded-t-[1.75rem] flex flex-col z-10 overflow-hidden"
             style={{
               backgroundColor: "var(--surface-primary)",
               borderTop: "1px solid var(--border-strong)",
@@ -206,7 +206,7 @@ export function FilterSidebar({
                 type="button"
                 onClick={onCloseMobile}
                 aria-label="Close filters"
-                className="inline-flex items-center justify-center w-10 h-10 rounded-full text-[var(--text-secondary)] bg-[var(--surface-raised)] cursor-pointer"
+                className="tap-press inline-flex items-center justify-center w-10 h-10 rounded-full text-[var(--text-secondary)] bg-[var(--surface-raised)] cursor-pointer"
               >
                 <X size={18} weight="regular" />
               </button>
@@ -220,7 +220,7 @@ export function FilterSidebar({
               <button
                 type="button"
                 onClick={onCloseMobile}
-                className="w-full h-12 rounded-xl button-md text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] active:scale-[0.99] transition-[background-color,transform] cursor-pointer"
+                className="tap-press w-full h-12 rounded-xl button-md text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
               >
                 Show matching papers
               </button>

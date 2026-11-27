@@ -503,7 +503,7 @@ export function UploadFormClient({
 
   if (receipt) {
     return (
-      <div className="max-w-xl mx-auto bezel-shell">
+      <div className="reveal-up max-w-xl mx-auto bezel-shell">
         <div className="bezel-core p-5 sm:p-6 space-y-5">
           <div className="flex items-center gap-3">
             <span
@@ -595,6 +595,48 @@ export function UploadFormClient({
       data-upload-ready={hydrated ? "true" : "false"}
       className="max-w-2xl mx-auto space-y-5"
     >
+      <div
+        aria-label="Upload progress steps"
+        className="grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-[var(--surface-primary)] border border-[var(--border-primary)]"
+      >
+        <div
+          className={`flex items-center justify-center gap-2 h-9 px-3 rounded-xl caption-4 transition-colors duration-200 ${
+            file
+              ? "bg-[var(--badge-regular-bg)] text-[var(--badge-regular-text)]"
+              : "bg-[var(--surface-raised)] text-[var(--text-primary)]"
+          }`}
+        >
+          <span
+            className={`w-5 h-5 rounded-full font-mono text-[11px] flex items-center justify-center shrink-0 ${
+              file
+                ? "bg-[var(--badge-regular-text)] text-white badge-pop"
+                : "bg-[var(--action-primary)] text-white"
+            }`}
+          >
+            {file ? "✓" : "1"}
+          </span>
+          <span className="truncate">Pages ready</span>
+        </div>
+        <div
+          className={`flex items-center justify-center gap-2 h-9 px-3 rounded-xl caption-4 transition-colors duration-200 ${
+            file
+              ? "bg-[var(--action-primary)] text-white"
+              : "text-[var(--text-muted)]"
+          }`}
+        >
+          <span
+            className={`w-5 h-5 rounded-full font-mono text-[11px] flex items-center justify-center shrink-0 ${
+              file
+                ? "bg-white/20 text-white"
+                : "bg-[var(--surface-raised)] text-[var(--text-muted)]"
+            }`}
+          >
+            2
+          </span>
+          <span className="truncate">Paper details</span>
+        </div>
+      </div>
+
       <div
         className="rounded-xl p-3.5 flex items-start gap-3 bg-[var(--surface-primary)]"
         style={{ border: "1px solid var(--border-primary)" }}
@@ -741,7 +783,7 @@ export function UploadFormClient({
           <div
             role="status"
             aria-live="polite"
-            className="rounded-xl p-3 flex flex-wrap items-center justify-between gap-2"
+            className="reveal-up rounded-xl p-3 flex flex-wrap items-center justify-between gap-2"
             style={{
               backgroundColor: convertingPhotos
                 ? "var(--surface-raised)"

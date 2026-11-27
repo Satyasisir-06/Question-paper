@@ -57,7 +57,7 @@ export function HeroShowcase({
       className="pt-1 pb-6 sm:pt-4 sm:pb-9 border-b border-[var(--border-primary)]"
     >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
-        <div className="lg:col-span-6 space-y-4 sm:space-y-5">
+        <div className="lg:col-span-6 space-y-4 sm:space-y-5 reveal-up">
           <p className="inline-flex items-center gap-2 caption-4 text-[var(--text-secondary)]">
             <Books size={15} weight="regular" aria-hidden="true" />
             <span>Exam cell verified archive</span>
@@ -71,35 +71,35 @@ export function HeroShowcase({
             Find previous Regular and Supply exam booklets in seconds, inspect every page inline, or bundle a semester folder as ZIP.
           </p>
 
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 pt-1">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 pt-1">
             <button
               type="button"
               onClick={onJumpToArchive}
-              className="group inline-flex items-center justify-between sm:justify-center gap-2.5 h-12 sm:h-11 pl-4 pr-2 sm:px-5 rounded-full button-md text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] active:scale-[0.98] transition-[background-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] focus-visible:ring-offset-2"
+              className="group tap-press inline-flex items-center justify-between sm:justify-center gap-3 h-12 sm:h-11 pl-4 pr-2 sm:pl-5 sm:pr-2.5 rounded-2xl sm:rounded-full button-md text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] focus-visible:ring-offset-2"
             >
-              <span>Browse archive</span>
+              <span className="whitespace-nowrap">Browse archive</span>
               <span
-                className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:translate-y-0.5"
+                className="w-8 h-8 rounded-xl sm:rounded-full bg-white/15 flex items-center justify-center shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0.5 group-active:translate-y-1"
                 aria-hidden="true"
               >
-                <ArrowDown size={15} weight="regular" />
+                <ArrowDown size={16} weight="regular" />
               </span>
             </button>
 
             <Link
               href="/upload"
-              className="group inline-flex items-center justify-between sm:justify-center gap-2.5 h-12 sm:h-11 pl-4 pr-2 sm:px-5 rounded-full button-md text-[var(--text-primary)] bg-[var(--surface-primary)] hover:bg-[var(--surface-raised)] active:scale-[0.98] transition-[background-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
+              className="group tap-press inline-flex items-center justify-between sm:justify-center gap-3 h-12 sm:h-11 pl-4 pr-2 sm:pl-5 sm:pr-2.5 rounded-2xl sm:rounded-full button-md text-[var(--text-primary)] bg-[var(--surface-primary)] hover:bg-[var(--surface-raised)] hover:border-[var(--action-primary)]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
               style={{
                 border: "1px solid var(--border-strong)",
                 boxShadow: "var(--shadow-card)",
               }}
             >
-              <span>Upload paper</span>
+              <span className="whitespace-nowrap">Upload paper</span>
               <span
-                className="w-8 h-8 rounded-full bg-[var(--surface-raised)] flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:-translate-y-0.5"
+                className="w-8 h-8 rounded-xl sm:rounded-full bg-[var(--surface-raised)] flex items-center justify-center shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-active:-translate-y-1"
                 aria-hidden="true"
               >
-                <UploadSimple size={15} weight="regular" />
+                <UploadSimple size={16} weight="regular" />
               </span>
             </Link>
           </div>

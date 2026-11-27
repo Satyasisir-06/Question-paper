@@ -245,7 +245,7 @@ function QueueInspector({
             key={tab.id}
             type="button"
             onClick={() => setMobilePane(tab.id)}
-            className={`h-9 rounded-lg caption-4 transition-colors cursor-pointer ${
+            className={`tap-press h-9 rounded-lg caption-4 cursor-pointer ${
               mobilePane === tab.id
                 ? "bg-[var(--surface-primary)] text-[var(--text-primary)] shadow-xs"
                 : "text-[var(--text-secondary)]"
@@ -760,7 +760,7 @@ export function ModerationWorkbenchClient({
               role="tab"
               aria-selected={statusTab === tab}
               onClick={() => handleTabSwitch(tab)}
-              className={`h-10 sm:h-8 px-3 rounded-lg sm:rounded-md caption-4 whitespace-nowrap cursor-pointer ${
+              className={`tap-press h-10 sm:h-8 px-3 rounded-lg sm:rounded-md caption-4 whitespace-nowrap cursor-pointer ${
                 statusTab === tab
                   ? "bg-[var(--surface-primary)] text-[var(--text-primary)] shadow-xs"
                   : "text-[var(--text-secondary)]"

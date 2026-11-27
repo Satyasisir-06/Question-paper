@@ -50,7 +50,7 @@ export function YearSemMatrix({
             <button
               type="button"
               onClick={() => onSelectYearSem(undefined, undefined)}
-              className={`shrink-0 h-10 sm:h-8 px-3.5 sm:px-2.5 rounded-xl sm:rounded-lg caption-4 whitespace-nowrap transition-[background-color,color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] ${
+              className={`tap-press shrink-0 h-10 sm:h-8 px-3.5 sm:px-2.5 rounded-xl sm:rounded-lg caption-4 whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] ${
                 selectedYear === undefined && selectedSem === undefined
                   ? "bg-[var(--action-primary)] text-white"
                   : "bg-[var(--surface-raised)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -67,7 +67,7 @@ export function YearSemMatrix({
                   onClick={() => onSelectYearSem(opt.year, opt.sem)}
                   aria-pressed={active}
                   title={opt.label}
-                  className={`shrink-0 h-10 sm:h-8 px-3.5 sm:px-2.5 rounded-xl sm:rounded-lg font-mono caption-4 tabular-nums whitespace-nowrap transition-[background-color,color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] ${
+                  className={`tap-press shrink-0 h-10 sm:h-8 px-3.5 sm:px-2.5 rounded-xl sm:rounded-lg font-mono caption-4 tabular-nums whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] ${
                     active
                       ? "bg-[var(--action-primary)] text-white"
                       : "bg-[var(--surface-raised)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -98,7 +98,7 @@ export function YearSemMatrix({
                   type="button"
                   onClick={() => onSelectExamType(tab.value)}
                   aria-pressed={active}
-                  className={`shrink-0 h-9 sm:h-7 px-3 sm:px-2.5 rounded-lg sm:rounded-md caption-4 whitespace-nowrap transition-[background-color,color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] ${
+                  className={`tap-press shrink-0 h-9 sm:h-7 px-3 sm:px-2.5 rounded-lg sm:rounded-md caption-4 whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] ${
                     active
                       ? "bg-[var(--surface-primary)] text-[var(--text-primary)] shadow-xs"
                       : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
