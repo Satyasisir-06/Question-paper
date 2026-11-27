@@ -11,7 +11,6 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 
 interface SiteHeaderProps {
   searchQuery?: string;
@@ -209,10 +208,6 @@ export function SiteHeader({
           <MobileMenuDrawer onClose={() => setMobileMenuOpen(false)} />
         </Suspense>
       )}
-
-      <Suspense fallback={null}>
-        <MobileBottomNav />
-      </Suspense>
     </>
   );
 }

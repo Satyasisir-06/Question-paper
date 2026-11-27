@@ -71,36 +71,55 @@ export function HeroShowcase({
             Find previous Regular and Supply exam booklets in seconds, inspect every page inline, or bundle a semester folder as ZIP.
           </p>
 
-          <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 pt-1">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 pt-1 max-w-md">
+            {/* ── Browse archive: primary catalog filing card ── */}
             <button
               type="button"
               onClick={onJumpToArchive}
-              className="group tap-press inline-flex items-center justify-between sm:justify-center gap-3 h-12 sm:h-11 pl-4 pr-2 sm:pl-5 sm:pr-2.5 rounded-2xl sm:rounded-full button-md text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] focus-visible:ring-offset-2"
+              className="group catalog-card catalog-card-primary rounded-xl sm:rounded-2xl cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] focus-visible:ring-offset-2"
             >
-              <span className="whitespace-nowrap">Browse archive</span>
-              <span
-                className="w-8 h-8 rounded-xl sm:rounded-full bg-white/15 flex items-center justify-center shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0.5 group-active:translate-y-1"
-                aria-hidden="true"
-              >
-                <ArrowDown size={16} weight="regular" />
-              </span>
+              <div className="catalog-card-ruled px-3.5 pt-3 pb-3 sm:px-4 sm:pt-3.5 sm:pb-3.5 flex flex-col gap-3 sm:gap-4">
+                <span className="catalog-corner-fold" aria-hidden="true" />
+                <span className="flex items-center gap-2">
+                  <span
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center shrink-0 bg-white/15 transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0.5"
+                    aria-hidden="true"
+                  >
+                    <ArrowDown size={15} weight="bold" />
+                  </span>
+                  <span className="font-mono text-[10px] opacity-70 tracking-wide">
+                    {totalCatalogPapers} papers
+                  </span>
+                </span>
+                <span className="block title-3 sm:button-md whitespace-nowrap">
+                  Browse archive
+                </span>
+              </div>
             </button>
 
+            {/* ── Upload paper: secondary catalog filing card ── */}
             <Link
               href="/upload"
-              className="group tap-press inline-flex items-center justify-between sm:justify-center gap-3 h-12 sm:h-11 pl-4 pr-2 sm:pl-5 sm:pr-2.5 rounded-2xl sm:rounded-full button-md text-[var(--text-primary)] bg-[var(--surface-primary)] hover:bg-[var(--surface-raised)] hover:border-[var(--action-primary)]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
-              style={{
-                border: "1px solid var(--border-strong)",
-                boxShadow: "var(--shadow-card)",
-              }}
+              className="group catalog-card rounded-xl sm:rounded-2xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
             >
-              <span className="whitespace-nowrap">Upload paper</span>
-              <span
-                className="w-8 h-8 rounded-xl sm:rounded-full bg-[var(--surface-raised)] flex items-center justify-center shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-active:-translate-y-1"
-                aria-hidden="true"
-              >
-                <UploadSimple size={16} weight="regular" />
-              </span>
+              <div className="catalog-card-ruled px-3.5 pt-3 pb-3 sm:px-4 sm:pt-3.5 sm:pb-3.5 flex flex-col gap-3 sm:gap-4">
+                <span className="catalog-corner-fold" aria-hidden="true" />
+                <span className="flex items-center gap-2">
+                  <span
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center shrink-0 bg-[var(--surface-raised)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5"
+                    style={{ border: "1px solid var(--border-primary)" }}
+                    aria-hidden="true"
+                  >
+                    <UploadSimple size={15} weight="regular" className="text-[var(--text-secondary)]" />
+                  </span>
+                  <span className="font-mono text-[10px] text-[var(--text-muted)] tracking-wide">
+                    Contribute
+                  </span>
+                </span>
+                <span className="block title-3 sm:button-md text-[var(--text-primary)] whitespace-nowrap">
+                  Upload paper
+                </span>
+              </div>
             </Link>
           </div>
 

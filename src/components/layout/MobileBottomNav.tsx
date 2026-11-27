@@ -10,26 +10,24 @@ export function MobileBottomNav() {
     return null;
   }
 
-  const items = [
+  const isArchive = pathname === "/" || pathname.startsWith("/papers/");
+  const isTrack = pathname.startsWith("/track");
+  const isUpload = pathname.startsWith("/upload");
+  const activeIndex = isArchive ? 0 : isTrack ? 1 : -1;
+
+  const readingTabs = [
     {
       href: "/",
       label: "Archive",
       ariaLabel: "Browse archive bottom tab",
-      active: pathname === "/" || pathname.startsWith("/papers/"),
+      active: isArchive,
       icon: Books,
-    },
-    {
-      href: "/upload",
-      label: "Upload",
-      ariaLabel: "Upload paper bottom tab",
-      active: pathname.startsWith("/upload"),
-      icon: UploadSimple,
     },
     {
       href: "/track",
       label: "Track",
       ariaLabel: "Track submission bottom tab",
-      active: pathname.startsWith("/track"),
+      active: isTrack,
       icon: ClockCounterClockwise,
     },
   ];
@@ -39,43 +37,80 @@ export function MobileBottomNav() {
       aria-label="Mobile thumb navigation"
       className="md:hidden fixed bottom-3 inset-x-3 z-30 pb-[env(safe-area-inset-bottom)] pointer-events-none"
     >
-      <div
-        className="pointer-events-auto max-w-md mx-auto rounded-2xl p-1.5 grid grid-cols-3 gap-1 backdrop-blur-xl"
-        style={{
-          backgroundColor: "color-mix(in srgb, var(--surface-primary) 90%, transparent)",
-          border: "1px solid var(--border-strong)",
-          boxShadow: "var(--shadow-float)",
-        }}
-      >
-        {items.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-label={item.ariaLabel}
-              className={`tap-press relative h-11 rounded-xl flex items-center justify-center gap-1.5 caption-4 active:scale-[0.94] ${
-                item.active
-                  ? "bg-[var(--action-primary)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
-                  : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-raised)]"
+      <div className="pointer-events-auto max-w-[400px] mx-auto flex items-center gap-2">
+        <div className="flex-1 min-w-0 dock-tray h-14 rounded-[20px] p-1 backdrop-blur-xl">
+          <div className="relative grid grid-cols-2 h-full">
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-4 bg-[var(--border-primary)]"
+            />
+            <span
+              aria-hidden="true"
+              className={`pointer-events-none absolute inset-y-0 left-0 w-1/2 rounded-[16px] dock-thumb transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                activeIndex >= 0 ? "opacity-100 scale-100" : "opacity-0 scale-95"
               }`}
+              style={{
+                transform: `translate3d(${activeIndex === 1 ? "100%" : "0%"}, 0, 0)`,
+              }}
             >
-              {item.active && (
-                <span
-                  aria-hidden="true"
-                  className="absolute top-1 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-white/80 badge-pop"
-                />
-              )}
-              <Icon
-                size={17}
-                weight={item.active ? "fill" : "regular"}
-                className={item.active ? "scale-105 transition-transform" : "transition-transform"}
-                aria-hidden="true"
-              />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
+              <span className="absolute top-1.5 left-1/2 -translate-x-1/2 w-5 h-[2px] rounded-full bg-[var(--action-primary)]" />
+            </span>
+
+            {readingTabs.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-label={item.ariaLabel}
+                  className={`tap-press relative z-10 flex items-center justify-center gap-2 rounded-[16px] text-[13px] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
+                    item.active
+                      ? "text-[var(--text-primary)]"
+                      : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                  }`}
+                >
+                  <Icon
+                    size={17}
+                    weight={item.active ? "fill" : "regular"}
+                    className={`transition-colors duration-200 ${
+                      item.active ? "text-[var(--action-primary)]" : ""
+                    }`}
+                    aria-hidden="true"
+                  />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        <Link
+          href="/upload"
+          aria-label="Upload paper bottom tab"
+          className={`group tap-press shrink-0 h-14 rounded-[20px] pl-2 pr-4 flex items-center gap-2.5 text-[13px] font-medium transition-[transform,background-color,color,border-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${
+            isUpload ? "dock-action-key-active" : "dock-action-key"
+          }`}
+        >
+          <span
+            aria-hidden="true"
+            className="w-9 h-9 rounded-[12px] flex items-center justify-center shrink-0"
+            style={{
+              backgroundColor: isUpload
+                ? "rgba(255, 255, 255, 0.16)"
+                : "color-mix(in srgb, currentColor 11%, transparent)",
+              border: isUpload
+                ? "1px solid rgba(255, 255, 255, 0.22)"
+                : "1px solid color-mix(in srgb, currentColor 14%, transparent)",
+            }}
+          >
+            <UploadSimple
+              size={17}
+              weight={isUpload ? "bold" : "regular"}
+              className="transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-active:-translate-y-0.5"
+            />
+          </span>
+          <span className="whitespace-nowrap">Upload</span>
+        </Link>
       </div>
     </nav>
   );

@@ -296,6 +296,179 @@ html.dark .archival-grain {
   transform: scale(0.965);
 }
 
+.dock-tray {
+  background-color: color-mix(in srgb, var(--surface-primary) 92%, transparent);
+  border: 1px solid var(--border-strong);
+  box-shadow:
+    var(--shadow-float),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+html.dark .dock-tray {
+  background-color: color-mix(in srgb, var(--surface-primary) 92%, transparent);
+  box-shadow:
+    var(--shadow-float),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.dock-thumb {
+  background-color: var(--surface-raised);
+  border: 1px solid var(--border-primary);
+  box-shadow:
+    0 1px 2px rgba(22, 22, 20, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+html.dark .dock-thumb {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+.dock-action-key {
+  background-color: var(--text-primary);
+  color: var(--surface-canvas);
+  border: 1px solid var(--border-strong);
+  box-shadow:
+    var(--shadow-float),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+html.dark .dock-action-key {
+  box-shadow:
+    var(--shadow-float),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.dock-action-key-active {
+  background-color: var(--action-primary);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    var(--shadow-float),
+    inset 0 1px 0 rgba(255, 255, 255, 0.26);
+}
+
+/* ---- Catalog action card ---- */
+.catalog-card {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--surface-primary);
+  border: 1px solid var(--border-primary);
+  box-shadow:
+    0 1px 2px rgba(22, 22, 20, 0.04),
+    0 4px 12px rgba(22, 22, 20, 0.03);
+  transition:
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.catalog-card:hover {
+  transform: translate3d(0, -2px, 0);
+  box-shadow:
+    0 2px 4px rgba(22, 22, 20, 0.05),
+    0 10px 24px rgba(22, 22, 20, 0.07);
+  border-color: var(--border-strong);
+}
+
+.catalog-card:active {
+  transform: translate3d(0, 0, 0) scale(0.985);
+  box-shadow: 0 1px 2px rgba(22, 22, 20, 0.06);
+}
+
+html.dark .catalog-card {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html.dark .catalog-card:hover {
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 12px 28px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.catalog-card-ruled {
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 19px,
+      var(--border-primary) 19px,
+      var(--border-primary) 20px
+    );
+  background-size: 100% 20px;
+  background-position: 0 0;
+}
+
+html.dark .catalog-card-ruled {
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 19px,
+      rgba(255, 255, 255, 0.04) 19px,
+      rgba(255, 255, 255, 0.04) 20px
+    );
+}
+
+.catalog-card-primary {
+  background-color: var(--action-primary);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+.catalog-card-primary .catalog-card-ruled {
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 19px,
+      rgba(255, 255, 255, 0.07) 19px,
+      rgba(255, 255, 255, 0.07) 20px
+    );
+}
+
+html.dark .catalog-card-primary {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+html.dark .catalog-card-primary:hover {
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 12px 28px rgba(37, 99, 235, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.catalog-corner-fold {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+}
+
+.catalog-corner-fold::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 20px 20px 0;
+  border-color: transparent var(--surface-canvas) transparent transparent;
+}
+
+.catalog-card-primary .catalog-corner-fold::before {
+  border-color: transparent color-mix(in srgb, var(--surface-canvas) 92%, var(--action-primary)) transparent transparent;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
