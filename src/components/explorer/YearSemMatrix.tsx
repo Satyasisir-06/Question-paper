@@ -46,15 +46,20 @@ export function YearSemMatrix({
               </button>
             )}
           </div>
-          <div className="flex sm:flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 sm:pb-0">
+          <div className="flex sm:flex-wrap items-center gap-1 overflow-x-auto no-scrollbar scroll-fade-x pr-5 sm:pr-0 pb-0.5 sm:pb-0 p-0.5 sm:p-0">
             <button
               type="button"
               onClick={() => onSelectYearSem(undefined, undefined)}
               className={`tap-press shrink-0 h-10 sm:h-8 px-3.5 sm:px-2.5 rounded-xl sm:rounded-lg caption-4 whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] ${
                 selectedYear === undefined && selectedSem === undefined
-                  ? "bg-[var(--action-primary)] text-white"
+                  ? "bg-[var(--action-primary)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
                   : "bg-[var(--surface-raised)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               }`}
+              style={
+                selectedYear === undefined && selectedSem === undefined
+                  ? undefined
+                  : { border: "1px solid var(--border-primary)" }
+              }
             >
               All
             </button>
@@ -69,9 +74,14 @@ export function YearSemMatrix({
                   title={opt.label}
                   className={`tap-press shrink-0 h-10 sm:h-8 px-3.5 sm:px-2.5 rounded-xl sm:rounded-lg font-mono caption-4 tabular-nums whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] ${
                     active
-                      ? "bg-[var(--action-primary)] text-white"
+                      ? "bg-[var(--action-primary)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
                       : "bg-[var(--surface-raised)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                   }`}
+                  style={
+                    active
+                      ? undefined
+                      : { border: "1px solid var(--border-primary)" }
+                  }
                 >
                   {opt.code}
                 </button>
@@ -82,7 +92,7 @@ export function YearSemMatrix({
 
         <div className="space-y-2 min-w-0">
           <p className="caption-4 text-[var(--text-secondary)]">
-            Exam category (Regular or Supply)
+            Exam category<span className="hidden sm:inline"> (Regular or Supply)</span>
           </p>
           <div
             role="group"

@@ -662,8 +662,15 @@ export function UploadFormClient({
         }}
       >
         <div className="flex items-center justify-between gap-2">
-          <span className="title-4 text-[var(--text-primary)]">
-            1. Question paper file or photos (max {MAX_PDF_MB} MB)
+          <span className="inline-flex items-center gap-2 title-4 text-[var(--text-primary)]">
+            <span
+              className="px-1.5 py-0.5 rounded-md font-mono text-[11px] bg-[var(--surface-raised)] text-[var(--text-secondary)]"
+              style={{ border: "1px solid var(--border-primary)" }}
+              aria-hidden="true"
+            >
+              01
+            </span>
+            <span>Question paper file or photos (max {MAX_PDF_MB} MB)</span>
           </span>
           {file && (
             <button
@@ -676,7 +683,8 @@ export function UploadFormClient({
                 setScanStatusText("");
                 setFileError("");
               }}
-              className="caption-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
+              className="tap-press h-8 px-2.5 rounded-lg caption-4 text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--surface-raised)] cursor-pointer"
+              style={{ border: "1px solid var(--border-primary)" }}
             >
               Clear
             </button>
@@ -942,8 +950,15 @@ export function UploadFormClient({
           boxShadow: "var(--shadow-card)",
         }}
       >
-        <p className="title-4 text-[var(--text-primary)]">
-          2. Subject &amp; exam details
+        <p className="inline-flex items-center gap-2 title-4 text-[var(--text-primary)]">
+          <span
+            className="px-1.5 py-0.5 rounded-md font-mono text-[11px] bg-[var(--surface-raised)] text-[var(--text-secondary)]"
+            style={{ border: "1px solid var(--border-primary)" }}
+            aria-hidden="true"
+          >
+            02
+          </span>
+          <span>Subject &amp; exam details</span>
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">

@@ -123,24 +123,63 @@ export function HeroShowcase({
             </Link>
           </div>
 
-          <dl className="pt-3.5 grid grid-cols-3 gap-4 max-w-md border-t border-[var(--border-primary)]">
-            <div>
-              <dt className="caption-5 text-[var(--text-muted)]">Verified papers</dt>
-              <dd className="mt-0.5 font-mono text-lg sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
-                {totalCatalogPapers}
-              </dd>
-            </div>
-            <div>
-              <dt className="caption-5 text-[var(--text-muted)]">Branches</dt>
-              <dd className="mt-0.5 font-mono text-lg sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
-                {branchCount}
-              </dd>
-            </div>
-            <div>
-              <dt className="caption-5 text-[var(--text-muted)]">Subjects</dt>
-              <dd className="mt-0.5 font-mono text-lg sm:text-2xl font-medium text-[var(--text-primary)] tabular-nums">
-                {subjectCount}
-              </dd>
+          <dl className="pt-2 max-w-md">
+            <div
+              className="grid grid-cols-3 rounded-xl sm:rounded-2xl bg-[var(--surface-primary)] divide-x divide-[var(--border-primary)] overflow-hidden"
+              style={{
+                border: "1px solid var(--border-primary)",
+                boxShadow: "var(--shadow-card)",
+              }}
+            >
+              {[
+                {
+                  label: "Verified papers",
+                  value: totalCatalogPapers,
+                  accent: true,
+                },
+                {
+                  label: "Branches",
+                  value: branchCount,
+                  accent: false,
+                },
+                {
+                  label: "Subjects",
+                  value: subjectCount,
+                  accent: false,
+                },
+              ].map((stat, idx) => (
+                <div
+                  key={stat.label}
+                  className="px-3 py-2.5 sm:px-4 sm:py-3 flex flex-col justify-between gap-2 min-w-0"
+                  style={{ animationDelay: `${idx * 60}ms` }}
+                >
+                  <div className="space-y-1.5 min-w-0">
+                    <span
+                      aria-hidden="true"
+                      className={`block w-4 h-[2px] rounded-full ${
+                        stat.accent
+                          ? "bg-[var(--action-primary)]"
+                          : "bg-[var(--border-strong)]"
+                      }`}
+                    />
+                    <dt className="text-[11px] sm:caption-5 leading-tight text-[var(--text-muted)]">
+                      {stat.label}
+                    </dt>
+                  </div>
+                  <dd
+                    className="tabular-nums text-[var(--text-primary)]"
+                    style={{
+                      fontFamily: "var(--font-serif), Georgia, serif",
+                      fontSize: "clamp(1.375rem, 3vw, 1.75rem)",
+                      lineHeight: 1,
+                      fontWeight: 500,
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    {stat.value}
+                  </dd>
+                </div>
+              ))}
             </div>
           </dl>
         </div>

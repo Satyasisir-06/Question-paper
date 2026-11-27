@@ -169,6 +169,13 @@ body {
   display: none;
 }
 
+@media (max-width: 639px) {
+  .scroll-fade-x {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent 100%);
+    mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent 100%);
+  }
+}
+
 .skeleton-bone {
   position: relative;
   overflow: hidden;
@@ -377,6 +384,20 @@ html.dark .dock-action-key {
   box-shadow: 0 1px 2px rgba(22, 22, 20, 0.06);
 }
 
+.catalog-card-static:hover {
+  transform: none;
+  box-shadow:
+    0 2px 6px rgba(22, 22, 20, 0.05),
+    0 10px 24px rgba(22, 22, 20, 0.05);
+}
+
+.catalog-card-static:active {
+  transform: none;
+  box-shadow:
+    0 1px 2px rgba(22, 22, 20, 0.04),
+    0 4px 12px rgba(22, 22, 20, 0.03);
+}
+
 html.dark .catalog-card {
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.3),
@@ -451,6 +472,7 @@ html.dark .catalog-card-primary:hover {
   width: 20px;
   height: 20px;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .catalog-corner-fold::before {
@@ -465,8 +487,28 @@ html.dark .catalog-card-primary:hover {
   border-color: transparent var(--surface-canvas) transparent transparent;
 }
 
+.catalog-corner-fold::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 20px 0 0 20px;
+  border-color: transparent transparent transparent rgba(22, 22, 20, 0.1);
+}
+
+html.dark .catalog-corner-fold::after {
+  border-color: transparent transparent transparent rgba(255, 255, 255, 0.12);
+}
+
 .catalog-card-primary .catalog-corner-fold::before {
   border-color: transparent color-mix(in srgb, var(--surface-canvas) 92%, var(--action-primary)) transparent transparent;
+}
+
+.catalog-card-primary .catalog-corner-fold::after {
+  border-color: transparent transparent transparent rgba(255, 255, 255, 0.26);
 }
 
 @media (prefers-reduced-motion: reduce) {

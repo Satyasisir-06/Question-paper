@@ -870,14 +870,16 @@ export function ModerationWorkbenchClient({
                             : "1px solid var(--border-primary)",
                         }}
                       >
-                        <span className="font-mono caption-4 text-[var(--text-primary)]">
+                        <span className="font-mono caption-4 text-[var(--text-primary)] shrink-0">
                           {item.subjectCode}
                         </span>
-                        <span className="body-6 text-[var(--text-secondary)] max-w-[160px] truncate">
+                        <span className="body-6 text-[var(--text-secondary)] max-w-[110px] sm:max-w-[160px] truncate">
                           {item.subjectName}
                         </span>
-                        <ExamTypeBadge examType={item.examType} />
-                        <span className="font-mono caption-5 text-[var(--text-muted)]">
+                        <span className="shrink-0">
+                          <ExamTypeBadge examType={item.examType} />
+                        </span>
+                        <span className="font-mono caption-5 text-[var(--text-muted)] shrink-0">
                           {item.trackingCode}
                         </span>
                       </button>

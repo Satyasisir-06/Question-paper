@@ -124,7 +124,16 @@ export function TrackClient({
           <button
             type="submit"
             disabled={loading || !code.trim()}
-            className="tap-press inline-flex items-center justify-center gap-2 h-11 sm:h-10 px-5 rounded-xl button-sm text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] disabled:opacity-60 cursor-pointer shrink-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
+            className={`tap-press inline-flex items-center justify-center gap-2 h-11 sm:h-10 px-5 rounded-xl button-sm shrink-0 transition-colors duration-200 ${
+              !code.trim() && !loading
+                ? "bg-[var(--surface-raised)] text-[var(--text-muted)] cursor-not-allowed"
+                : "text-white bg-[var(--action-primary)] hover:bg-[var(--action-primary-hover)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] cursor-pointer"
+            }`}
+            style={
+              !code.trim() && !loading
+                ? { border: "1px solid var(--border-primary)" }
+                : undefined
+            }
           >
             {loading ? (
               <CircleNotch size={16} className="animate-spin" />
@@ -152,7 +161,7 @@ export function TrackClient({
 
       {!result && !errorMsg && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-          <div className="rounded-2xl p-4 bg-[var(--surface-primary)] border border-[var(--border-primary)] space-y-1.5">
+          <div className="catalog-card catalog-card-ruled rounded-2xl p-4 space-y-1.5">
             <div className="flex items-center gap-2 text-[var(--text-primary)] title-4">
               <Clock size={16} weight="regular" className="text-[var(--badge-pending-text)]" />
               <span>Pending review</span>
@@ -161,7 +170,7 @@ export function TrackClient({
               Uploads remain private until an exam admin verifies the PDF pages.
             </p>
           </div>
-          <div className="rounded-2xl p-4 bg-[var(--surface-primary)] border border-[var(--border-primary)] space-y-1.5">
+          <div className="catalog-card catalog-card-ruled rounded-2xl p-4 space-y-1.5">
             <div className="flex items-center gap-2 text-[var(--text-primary)] title-4">
               <CheckCircle size={16} weight="regular" className="text-[var(--badge-regular-text)]" />
               <span>Published</span>
@@ -174,12 +183,17 @@ export function TrackClient({
       )}
 
       {result && (
-        <div className="reveal-up bezel-shell">
-          <div className="bezel-core p-5 sm:p-6 space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="font-mono caption-4 text-[var(--text-muted)]">
-                {result.trackingCode}
-              </span>
+        <div className="reveal-up catalog-card catalog-card-static rounded-2xl">
+          <div className="catalog-card-ruled p-5 sm:p-6 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-dashed border-[var(--border-primary)]">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                  Receipt
+                </span>
+                <span className="font-mono caption-4 text-[var(--text-primary)]">
+                  {result.trackingCode}
+                </span>
+              </div>
               <StatusBadge status={result.status} />
             </div>
 

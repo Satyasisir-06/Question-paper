@@ -10,6 +10,7 @@ import {
   MagnifyingGlass,
   Package,
   UploadSimple,
+  X,
 } from "@phosphor-icons/react";
 import type {
   FilterCatalogDto,
@@ -281,7 +282,7 @@ export function ExplorerClient({
 
       <main
         id="main-content"
-        className="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-4 md:px-6 pt-4 sm:pt-7 pb-6 space-y-6 sm:space-y-8"
+        className="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-4 md:px-6 pt-4 sm:pt-7 pb-6 space-y-4 sm:space-y-6"
       >
         <HeroShowcase
           branchCount={initialCatalog.branches.length}
@@ -294,11 +295,11 @@ export function ExplorerClient({
           id="archive-explorer"
           className="scroll-mt-20 rounded-2xl p-3.5 sm:p-0 bg-[var(--surface-primary)] sm:bg-transparent border border-[var(--border-primary)] sm:border-0 shadow-[var(--shadow-card)] sm:shadow-none space-y-3 sm:space-y-4"
         >
-          <div className="md:hidden relative">
+          <div className="md:hidden relative flex items-center">
             <MagnifyingGlass
               size={16}
               weight="regular"
-              className="absolute left-3.5 top-3.5 text-[var(--text-muted)] pointer-events-none"
+              className="absolute left-3.5 text-[var(--text-muted)] pointer-events-none"
             />
             <input
               type="search"
@@ -306,24 +307,39 @@ export function ExplorerClient({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search subject code or name"
               aria-label="Search subject code or name"
-              className="w-full h-11 pl-10 pr-3 rounded-xl text-base sm:text-sm bg-[var(--surface-raised)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
+              className="w-full h-11 pl-10 pr-10 rounded-xl text-base sm:text-sm bg-[var(--surface-raised)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8]"
               style={{ border: "1px solid var(--border-primary)" }}
             />
+            {searchQuery.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                aria-label="Clear subject search"
+                className="tap-press absolute right-1.5 w-8 h-8 rounded-lg inline-flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-primary)] cursor-pointer"
+              >
+                <X size={14} weight="regular" />
+              </button>
+            )}
           </div>
 
           {initialCatalog.branches.length > 0 && (
             <div
               aria-label="Quick branch filter"
-              className="lg:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5"
+              className="lg:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-fade-x pr-5 pb-0.5"
             >
               <button
                 type="button"
                 onClick={() => setBranch("")}
                 className={`tap-press shrink-0 h-9 px-3 rounded-xl caption-4 cursor-pointer active:scale-[0.94] ${
                   branch === ""
-                    ? "bg-[var(--action-primary)] text-white"
+                    ? "bg-[var(--action-primary)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
                     : "bg-[var(--surface-raised)] text-[var(--text-secondary)]"
                 }`}
+                style={
+                  branch === ""
+                    ? undefined
+                    : { border: "1px solid var(--border-primary)" }
+                }
               >
                 All branches
               </button>
@@ -336,9 +352,14 @@ export function ExplorerClient({
                     onClick={() => setBranch(active ? "" : br.code)}
                     className={`tap-press shrink-0 h-9 px-3 rounded-xl font-mono caption-4 cursor-pointer active:scale-[0.94] ${
                       active
-                        ? "bg-[var(--action-primary)] text-white"
+                        ? "bg-[var(--action-primary)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
                         : "bg-[var(--surface-raised)] text-[var(--text-secondary)]"
                     }`}
+                    style={
+                      active
+                        ? undefined
+                        : { border: "1px solid var(--border-primary)" }
+                    }
                   >
                     {br.code}
                   </button>
@@ -533,7 +554,7 @@ export function ExplorerClient({
 
             {selectedIds.length > 0 && viewMode === "cards" && (
               <div
-                className="sheet-up fixed bottom-20 md:bottom-4 inset-x-3 z-20 sm:static rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3 backdrop-blur-md"
+                className="sheet-up fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] md:bottom-4 inset-x-3 z-20 sm:static rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3 backdrop-blur-md"
                 style={{
                   backgroundColor: "color-mix(in srgb, var(--surface-primary) 94%, transparent)",
                   border: "1.5px solid var(--action-primary)",
